@@ -1,0 +1,48 @@
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--secondary);
+}
+.stat-label { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.stat-value { font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+
+.quick-actions h2 { font-size: 1.1rem; margin-bottom: 1rem; color: var(--text); }
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.action-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.5rem 1rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+.action-card:hover { border-color: var(--secondary); transform: translateY(-2px); }
+.action-icon { font-size: 2rem; width: 56px; height: 56px; background: var(--bg);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+.recent-declarations { margin-top: 1rem; }
+.recent-declarations h2 { font-size: 1.1rem; margin-bottom: 1rem; }
