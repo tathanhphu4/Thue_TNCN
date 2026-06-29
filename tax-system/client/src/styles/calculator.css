@@ -1,0 +1,349 @@
+/* ===== CALCULATOR PAGE ===== */
+
+.calc-page {
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.calc-header {
+  margin-bottom: 1.5rem;
+}
+
+.calc-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 0.25rem;
+}
+
+.calc-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Layout 2 cột */
+.calc-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .calc-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== FORM CARD ===== */
+.calc-form-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  margin-bottom: 1.25rem;
+}
+
+.calc-form-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid var(--primary);
+  display: inline-block;
+}
+
+/* Input với đơn vị tiền */
+.input-currency {
+  position: relative;
+}
+
+.input-currency .form-input {
+  padding-right: 2rem;
+}
+
+.currency-unit {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.input-hint {
+  font-size: 0.78rem;
+  color: var(--secondary);
+  margin: 0.25rem 0 0;
+}
+
+/* Dependents +/- */
+.dependents-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: fit-content;
+}
+
+.dep-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid var(--primary);
+  background: white;
+  color: var(--primary);
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.dep-btn:hover:not(:disabled) {
+  background: var(--primary);
+  color: white;
+}
+
+.dep-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.dep-input {
+  width: 60px !important;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* Actions */
+.calc-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.btn-outline {
+  background: white;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-outline:hover {
+  background: #eef6fc;
+}
+
+/* ===== BIỂU THUẾ TABLE ===== */
+.bracket-table-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.bracket-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 0.9rem;
+}
+
+.bracket-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.bracket-table th {
+  background: var(--primary);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.bracket-table th:first-child { border-radius: 6px 0 0 0; }
+.bracket-table th:last-child  { border-radius: 0 6px 0 0; }
+
+.bracket-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--text);
+}
+
+.bracket-table tr:last-child td { border-bottom: none; }
+
+.bracket-table tr.bracket-active td {
+  background: #fff8e1;
+  font-weight: 600;
+  color: #b7791f;
+}
+
+.bracket-level {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.bracket-rate {
+  font-weight: 700;
+}
+
+.bracket-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0.75rem 0 0;
+  line-height: 1.5;
+}
+
+/* ===== RESULT CARD ===== */
+.result-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  overflow: hidden;
+}
+
+.result-card__header {
+  background: var(--primary);
+  padding: 1rem 1.25rem;
+}
+
+.result-card__header h3 {
+  margin: 0;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.result-card__body {
+  padding: 1.25rem;
+}
+
+.result-section {
+  margin-bottom: 1.1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.result-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.result-section-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin: 0 0 0.6rem;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.35rem 0;
+  font-size: 0.9rem;
+}
+
+.result-row--bold .result-label,
+.result-row--bold .result-value {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.result-row--highlight {
+  background: #fff5f5;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  margin: 0.25rem 0;
+}
+
+.result-row--highlight .result-label,
+.result-row--highlight .result-value {
+  color: #c53030;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.result-label { color: var(--text-muted); }
+.result-value { font-weight: 600; color: var(--text); }
+
+/* Bracket detail */
+.bracket-detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  padding: 0.3rem 0;
+  color: var(--text);
+}
+
+.bracket-detail-label { color: var(--text-muted); }
+.bracket-detail-range { font-size: 0.78rem; }
+.bracket-detail-tax   { font-weight: 600; }
+
+/* Summary section */
+.result-section--summary {
+  background: #f8faff;
+  border-radius: 10px;
+  padding: 0.75rem !important;
+  border: none !important;
+}
+
+/* Effective rate */
+.effective-rate {
+  text-align: right;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0.75rem 0 0;
+}
+
+/* Empty state */
+.calc-empty {
+  background: white;
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.calc-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.calc-empty p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Reuse từ auth.css */
+.form-group    { margin-bottom: 1rem; }
+.form-label    { display: block; font-size: 0.875rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+.form-input    { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; color: var(--text); background: #fff; transition: border-color 0.2s; box-sizing: border-box; outline: none; }
+.form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(41,128,185,0.15); }
+.form-input.input-error { border-color: #e53e3e; }
+.required      { color: #e53e3e; }
+.error-text    { color: #e53e3e; font-size: 0.78rem; margin: 0.3rem 0 0; }
+.btn           { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.7rem 1.5rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; }
+.btn-primary   { background: var(--primary); color: white; }
+.btn-primary:hover:not(:disabled) { background: #1a6ca8; }
+.btn-primary:disabled { opacity: 0.65; cursor: not-allowed; }
+.spinner       { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }

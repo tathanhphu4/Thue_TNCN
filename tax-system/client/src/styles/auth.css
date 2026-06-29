@@ -1,3 +1,4 @@
+/* ===== AUTH.CSS - GIỮ NGUYÊN PHẦN CŨ ===== */
 .auth-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #1a3c5e 0%, #2980b9 100%);
@@ -6,7 +7,6 @@
   justify-content: center;
   padding: 1rem;
 }
-
 .auth-card {
   background: white;
   border-radius: 12px;
@@ -15,20 +15,17 @@
   max-width: 420px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.2);
 }
-
 .auth-header {
   text-align: center;
   margin-bottom: 1.5rem;
 }
 .auth-header h1 { font-size: 2rem; color: var(--primary); font-weight: 800; }
 .auth-header p  { color: var(--text-muted); font-size: 0.9rem; }
-
 .auth-card h2 {
   font-size: 1.3rem;
   margin-bottom: 1.2rem;
   color: var(--text);
 }
-
 .auth-link {
   text-align: center;
   margin-top: 1rem;
@@ -36,3 +33,186 @@
   color: var(--text-muted);
 }
 .auth-link a { color: var(--secondary); font-weight: 600; text-decoration: none; }
+
+/* ===== BỔ SUNG CHO REGISTER PAGE ===== */
+
+/* Card rộng hơn cho form đăng ký nhiều field */
+.auth-card--wide {
+  max-width: 580px;
+  padding: 2rem 2.5rem;
+}
+
+/* 2-cột cho các field đi đôi */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .auth-card--wide {
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+/* Form group */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.required {
+  color: #e53e3e;
+  margin-left: 2px;
+}
+
+.optional {
+  font-weight: 400;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+/* Input */
+.form-input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(41, 128, 185, 0.15);
+}
+
+.form-input.input-error {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+.form-input:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Password wrapper */
+.input-wrapper {
+  position: relative;
+}
+
+.input-wrapper .form-input {
+  padding-right: 2.5rem;
+}
+
+.toggle-pass {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem;
+  line-height: 1;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.toggle-pass:hover {
+  opacity: 1;
+}
+
+/* Error text */
+.error-text {
+  color: #e53e3e;
+  font-size: 0.78rem;
+  margin-top: 0.3rem;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Alert server error */
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.alert-error {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+  color: #c53030;
+}
+
+/* Button */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1a6ca8;
+}
+
+.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.btn-block {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

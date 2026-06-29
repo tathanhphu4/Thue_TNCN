@@ -37,8 +37,8 @@ const seed = async () => {
     console.log('User created: user@taxvn.com / User@123');
   }
 
-  // Tao cau hinh thue 2024
-  const existingConfig = await TaxConfig.findOne({ year: 2024 });
+  // Tao cau hinh thue 2026
+  const existingConfig = await TaxConfig.findOne({ year: 2026 });
   if (!existingConfig) {
     await TaxConfig.create({
       year: 2024,
