@@ -1,4 +1,7 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
+
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // GET /api/users (admin)
 exports.getAllUsers = async (req, res) => {
@@ -6,7 +9,8 @@ exports.getAllUsers = async (req, res) => {
     const users = await User.find({ role: 'user' }).select('-password');
     res.json({ success: true, data: users });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('getAllUsers error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy danh sách người dùng.' });
   }
 };
 
@@ -22,7 +26,8 @@ exports.updateProfile = async (req, res) => {
     ).select('-password');
     res.json({ success: true, data: user });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('updateProfile error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi cập nhật hồ sơ.' });
   }
 };
 
@@ -53,13 +58,17 @@ exports.changePassword = async (req, res) => {
 
     res.json({ success: true, message: 'Đổi mật khẩu thành công' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('changePassword error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi đổi mật khẩu. Vui lòng thử lại.' });
   }
 };
 
 // PUT /api/users/:id/toggle-status (admin: khóa/mở khóa tài khoản)
 exports.toggleUserStatus = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID không hợp lệ.' });
+    }
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
@@ -78,6 +87,7 @@ exports.toggleUserStatus = async (req, res) => {
       data: { _id: user._id, fullName: user.fullName, email: user.email, isActive: user.isActive }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('toggleUserStatus error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi thay đổi trạng thái tài khoản.' });
   }
 };

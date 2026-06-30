@@ -1,13 +1,26 @@
+const mongoose = require('mongoose');
 const TaxDeclaration = require('../models/TaxDeclaration');
 const { calculateTax, calculateTaxableIncome } = require('../utils/taxCalculator');
 const { PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../config/taxRules');
 
 const TaxConfig = require('../models/TaxConfig');
 
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
 // POST /api/tax/calculate  (tính thuế không lưu)
 exports.calculate = async (req, res) => {
   try {
     const { totalIncome, dependents = 0, otherDeductions = 0, year = 2024 } = req.body;
+
+    if (typeof totalIncome !== 'number' || totalIncome < 0) {
+      return res.status(400).json({ success: false, message: 'Tổng thu nhập phải là số không âm.' });
+    }
+    if (typeof dependents !== 'number' || dependents < 0 || !Number.isInteger(dependents)) {
+      return res.status(400).json({ success: false, message: 'Số người phụ thuộc không hợp lệ.' });
+    }
+    if (typeof otherDeductions !== 'number' || otherDeductions < 0) {
+      return res.status(400).json({ success: false, message: 'Khoản giảm trừ khác phải là số không âm.' });
+    }
     
     let personalDeduction = PERSONAL_DEDUCTION;
     let dependentDeduction = DEPENDENT_DEDUCTION;
@@ -27,7 +40,8 @@ exports.calculate = async (req, res) => {
     const { totalTax, brackets } = calculateTax(taxableIncome, taxBrackets);
     res.json({ success: true, data: { totalIncome, taxableIncome, totalTax, brackets } });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('calculate error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi tính thuế. Vui lòng thử lại.' });
   }
 };
 
@@ -36,6 +50,21 @@ exports.calculate = async (req, res) => {
 exports.declare = async (req, res) => {
   try {
     const { year, month, declarationType, incomes, deductions } = req.body;
+
+    if (!year || !declarationType) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập năm và loại khai báo.' });
+    }
+    if (!Array.isArray(incomes) || incomes.length === 0) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập ít nhất một nguồn thu nhập.' });
+    }
+    if (!Array.isArray(deductions)) {
+      return res.status(400).json({ success: false, message: 'Dữ liệu giảm trừ không hợp lệ.' });
+    }
+    for (const inc of incomes) {
+      if (typeof inc.amount !== 'number' || inc.amount < 0) {
+        return res.status(400).json({ success: false, message: 'Số tiền thu nhập phải là số không âm.' });
+      }
+    }
 
     const totalIncome    = incomes.reduce((s, i) => s + i.amount, 0);
     const dependents     = deductions.find(d => d.type === 'dependent')?.dependents || 0;
@@ -69,7 +98,8 @@ exports.declare = async (req, res) => {
 
     res.status(201).json({ success: true, data: declaration });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('declare error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi khai báo thuế. Vui lòng thử lại.' });
   }
 };
 
@@ -79,27 +109,41 @@ exports.getDeclarations = async (req, res) => {
     const declarations = await TaxDeclaration.find({ user: req.user._id }).sort({ createdAt: -1 });
     res.json({ success: true, data: declarations });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('getDeclarations error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy danh sách tờ khai.' });
   }
 };
 
 // GET /api/tax/declarations/:id
 exports.getDeclaration = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID không hợp lệ.' });
+    }
     const declaration = await TaxDeclaration.findOne({ _id: req.params.id, user: req.user._id });
     if (!declaration) return res.status(404).json({ success: false, message: 'Không tìm thấy' });
     res.json({ success: true, data: declaration });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('getDeclaration error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy chi tiết tờ khai.' });
   }
 };
 // POST /api/tax/declarations/:id/pay
 exports.payDeclaration = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID không hợp lệ.' });
+    }
+
     const { paymentMethod } = req.body;
 
     if (!paymentMethod) {
       return res.status(400).json({ success: false, message: 'Vui lòng chọn phương thức thanh toán.' });
+    }
+
+    const allowedMethods = ['bank_transfer', 'online', 'cash', 'momo'];
+    if (!allowedMethods.includes(paymentMethod)) {
+      return res.status(400).json({ success: false, message: 'Phương thức thanh toán không hợp lệ.' });
     }
 
     const declaration = await TaxDeclaration.findOne({
@@ -126,7 +170,8 @@ exports.payDeclaration = async (req, res) => {
 
     res.json({ success: true, data: declaration });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('payDeclaration error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi thanh toán. Vui lòng thử lại.' });
   }
 };
 
@@ -136,6 +181,7 @@ exports.getAllDeclarations = async (req, res) => {
     const declarations = await TaxDeclaration.find().populate('user').sort({ createdAt: -1 });
     res.json({ success: true, data: declarations });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('getAllDeclarations error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy danh sách tờ khai.' });
   }
 };

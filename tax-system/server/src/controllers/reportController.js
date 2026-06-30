@@ -1,5 +1,8 @@
+const mongoose = require('mongoose');
 const TaxDeclaration = require('../models/TaxDeclaration');
 const User = require('../models/User');
+
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // GET /api/reports/summary  (admin: tổng quan hệ thống)
 exports.getSystemSummary = async (req, res) => {
@@ -20,7 +23,8 @@ exports.getSystemSummary = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('getSystemSummary error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy thống kê hệ thống.' });
   }
 };
 
@@ -36,13 +40,18 @@ exports.getUserReport = async (req, res) => {
 
     res.json({ success: true, data: { declarations, totalTax } });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('getUserReport error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy báo cáo cá nhân.' });
   }
 };
 
 // GET /api/reports/export/pdf/:id  (user: xuất PDF phiếu thuế)
 exports.exportPDF = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'ID không hợp lệ.' });
+    }
+
     const fs = require('fs');
     const PDFDocument = require('pdfkit');
     
@@ -172,76 +181,84 @@ exports.exportPDF = async (req, res) => {
     
     doc.end();
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: err.message });
+    console.error('exportPDF error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi xuất PDF.' });
   }
 };
 
 // GET /api/reports/export/excel  (admin: xuất Excel tất cả tờ khai)
 exports.exportExcel = async (req, res) => {
   try {
-    const XLSX = require('xlsx');
+    const ExcelJS = require('exceljs');
     const declarations = await TaxDeclaration.find().populate('user').sort({ createdAt: -1 });
 
-    const formattedData = declarations.map((d, index) => {
+    const statusMap = {
+      draft: 'Nháp',
+      pending: 'Chờ nộp',
+      submitted: 'Đã nộp tờ khai',
+      paid: 'Đã nộp thuế',
+      overdue: 'Quá hạn',
+      cancelled: 'Đã hủy'
+    };
+
+    const typeMap = {
+      monthly: 'Tháng',
+      annual: 'Năm'
+    };
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('DanhSachKhaiBao');
+
+    worksheet.columns = [
+      { header: 'STT', key: 'stt', width: 6 },
+      { header: 'Mã Khai Báo', key: 'maKhaiBao', width: 28 },
+      { header: 'Người Nộp Thuế', key: 'nguoiNopThue', width: 22 },
+      { header: 'Email', key: 'email', width: 22 },
+      { header: 'Mã Số Thuế', key: 'maSoThue', width: 16 },
+      { header: 'Số CCCD', key: 'soCCCD', width: 16 },
+      { header: 'Năm Thuế', key: 'namThue', width: 10 },
+      { header: 'Kỳ Tính Thuế', key: 'kyTinhThue', width: 14 },
+      { header: 'Chi Tiết Kỳ', key: 'chiTietKy', width: 14 },
+      { header: 'Tổng Thu Nhập (VND)', key: 'tongThuNhap', width: 20 },
+      { header: 'Tổng Giảm Trừ (VND)', key: 'tongGiamTru', width: 20 },
+      { header: 'Thu Nhập Chịu Thuế (VND)', key: 'thuNhapChiuThue', width: 22 },
+      { header: 'Thuế Phải Nộp (VND)', key: 'thuePhaiNop', width: 20 },
+      { header: 'Trạng Thái', key: 'trangThai', width: 18 },
+      { header: 'Ngày Khai Báo', key: 'ngayKhaiBao', width: 14 },
+      { header: 'Ngày Nộp Tiền', key: 'ngayNopTien', width: 14 },
+      { header: 'Phương Thức Thanh Toán', key: 'phuongThuc', width: 22 },
+    ];
+
+    declarations.forEach((d, index) => {
       const u = d.user || {};
-      const statusMap = {
-        draft: 'Nháp',
-        pending: 'Chờ nộp',
-        submitted: 'Đã nộp tờ khai',
-        paid: 'Đã nộp thuế',
-        overdue: 'Quá hạn',
-        cancelled: 'Đã hủy'
-      };
-
-      const typeMap = {
-        monthly: 'Tháng',
-        annual: 'Năm'
-      };
-
-      return {
-        'STT': index + 1,
-        'Mã Khai Báo': d._id.toString().toUpperCase(),
-        'Người Nộp Thuế': u.fullName || 'N/A',
-        'Email': u.email || 'N/A',
-        'Mã Số Thuế': u.taxCode || 'N/A',
-        'Số CCCD': u.idNumber || u.idCard || 'N/A',
-        'Năm Thuế': d.year,
-        'Kỳ Tính Thuế': typeMap[d.declarationType] || d.declarationType,
-        'Chi Tiết Kỳ': d.declarationType === 'monthly' ? `Tháng ${d.month}` : `Cả năm`,
-        'Tổng Thu Nhập (VND)': d.totalIncome,
-        'Tổng Giảm Trừ (VND)': d.totalDeduction,
-        'Thu Nhập Chịu Thuế (VND)': d.taxableIncome,
-        'Thuế Phải Nộp (VND)': d.taxAmount,
-        'Trạng Thế': statusMap[d.status] || d.status,
-        'Ngày Khai Báo': d.createdAt ? new Date(d.createdAt).toLocaleDateString('vi-VN') : '',
-        'Ngày Nộp Tiền': d.paidAt ? new Date(d.paidAt).toLocaleDateString('vi-VN') : 'Chưa nộp',
-        'Phương Thức Thanh Toán': d.paymentMethod || ''
-      };
-    });
-
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachKhaiBao');
-
-    // Auto-fit widths
-    const maxLens = {};
-    formattedData.forEach((row) => {
-      Object.keys(row).forEach((key) => {
-        const valStr = String(row[key] || '');
-        maxLens[key] = Math.max(maxLens[key] || 10, valStr.length + 3);
+      worksheet.addRow({
+        stt: index + 1,
+        maKhaiBao: d._id.toString().toUpperCase(),
+        nguoiNopThue: u.fullName || 'N/A',
+        email: u.email || 'N/A',
+        maSoThue: u.taxCode || 'N/A',
+        soCCCD: u.idNumber || u.idCard || 'N/A',
+        namThue: d.year,
+        kyTinhThue: typeMap[d.declarationType] || d.declarationType,
+        chiTietKy: d.declarationType === 'monthly' ? `Tháng ${d.month}` : 'Cả năm',
+        tongThuNhap: d.totalIncome,
+        tongGiamTru: d.totalDeduction,
+        thuNhapChiuThue: d.taxableIncome,
+        thuePhaiNop: d.taxAmount,
+        trangThai: statusMap[d.status] || d.status,
+        ngayKhaiBao: d.createdAt ? new Date(d.createdAt).toLocaleDateString('vi-VN') : '',
+        ngayNopTien: d.paidAt ? new Date(d.paidAt).toLocaleDateString('vi-VN') : 'Chưa nộp',
+        phuongThuc: d.paymentMethod || '',
       });
     });
-    const colWidths = Object.keys(maxLens).map(key => ({ wch: maxLens[key] }));
-    worksheet['!cols'] = colWidths;
-
-    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
 
     res.setHeader('Content-Disposition', 'attachment; filename=danh_sach_khai_bao_thue.xlsx');
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.send(buffer);
+    await workbook.xlsx.write(res);
+    res.end();
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('exportExcel error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi xuất Excel.' });
   }
 };
 

@@ -31,7 +31,8 @@ router.get('/tax-rules', protect, async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('getTaxRules error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi lấy cấu hình thuế.' });
   }
 });
 
@@ -67,7 +68,8 @@ router.put('/tax-rules', protect, adminOnly, async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('updateTaxRules error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi cập nhật cấu hình thuế.' });
   }
 });
 
