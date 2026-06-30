@@ -34,7 +34,7 @@ export default function AdminPage() {
   const [summary, setSummary] = useState({ totalUsers: 0, totalDeclarations: 0, totalTaxCollected: 0 });
   
   // Tax configuration state
-  const [configYear, setConfigYear] = useState(2024);
+  const [configYear, setConfigYear] = useState(2025);
   const [taxConfig, setTaxConfig] = useState({
     personalDeduction: 11000000,
     dependentDeduction: 4400000,
@@ -532,8 +532,8 @@ export default function AdminPage() {
                     onChange={(e) => setConfigYear(parseInt(e.target.value))}
                     style={{ fontWeight: 'bold' }}
                   >
-                    <option value={2024}>2024 (Biểu thuế hiện tại)</option>
-                    <option value={2025}>2025</option>
+                    <option value={2024}>2024</option>
+                    <option value={2025}>2025 (Biểu thuế hiện tại)</option>
                     <option value={2026}>2026</option>
                   </select>
                 </div>

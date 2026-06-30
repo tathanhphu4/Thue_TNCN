@@ -352,3 +352,118 @@
   .modal-overlay { align-items: flex-end; }
   .amount-value { font-size: 1.2rem; }
 }
+
+/* Payment instructions box */
+.payment-instructions-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.payment-instructions-box h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary, #1f2937);
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+.payment-instructions-box.text-center h4 {
+  text-align: center;
+}
+.instruction-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+.instruction-row:last-of-type {
+  border-bottom: none;
+}
+.instruction-row span {
+  color: var(--text-secondary, #4b5563);
+}
+.instruction-row strong {
+  color: var(--text-primary, #111827);
+}
+.clickable-text {
+  color: var(--primary, #3b82f6) !important;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.clickable-text:hover {
+  color: #1d4ed8 !important;
+  text-decoration: underline;
+}
+.instruction-tip {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+/* QR Code Container */
+.qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
+}
+.qr-image {
+  max-width: 180px;
+  max-height: 180px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  padding: 0.25rem;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.qr-placeholder-card {
+  width: 180px;
+  height: 180px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+  color: #64748b;
+}
+.qr-placeholder-icon {
+  font-size: 2.2rem;
+  margin-bottom: 0.25rem;
+}
+.qr-placeholder-card p {
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem;
+  color: #475569;
+}
+.qr-placeholder-card small {
+  font-size: 0.65rem;
+  color: #64748b;
+  line-height: 1.2;
+}
+.qr-placeholder-card code {
+  font-size: 0.65rem;
+  background: #e2e8f0;
+  padding: 0.1rem 0.25rem;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+  word-break: break-all;
+  font-family: monospace;
+}
+.mt-2 {
+  margin-top: 0.5rem;
+}
+.text-center {
+  text-align: center;
+}

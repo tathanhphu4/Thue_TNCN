@@ -143,10 +143,10 @@ const TaxCalculatorPage = () => {
             <h2 className="calc-form-title">Thông tin thu nhập</h2>
             <form onSubmit={handleCalculate} noValidate>
 
-              {/* Thu nhập brutto */}
+              {/* Thu nhập tháng */}
               <div className="form-group">
                 <label className="form-label" htmlFor="grossIncome">
-                  Thu nhập brutto (đồng/tháng) <span className="required">*</span>
+                  Thu nhập tháng (đồng/tháng) <span className="required">*</span>
                 </label>
                 <div className="input-currency">
                   <input

@@ -222,7 +222,9 @@
 |-----|--------|------------|---------|
 | 1 | TaxHistoryPage dung `taxYear` nhung schema dung `year` | ✅ Da sua | Sua cac fallback d.taxYear thanh d.year |
 | 2 | Model Payment khong duoc dung trong payDeclaration | ✅ Da quyet dinh | Don gian hoa, cap nhat truc tiep TaxDeclaration |
-| 3 | seed.js kiem tra TaxConfig nam 2026 thay vi 2024 | ✅ Da sua | Sua dieu kien findOne({ year: 2026 }) thanh 2024 |
+| 3 | seed.js kiem tra TaxConfig nam 2026 thay vi 2024 | ✅ Da sua | Khoi tao cau hinh tu dong cho ca 3 nam 2024, 2025, 2026 |
+| 4 | TaxHistoryPage crash vi sai cau truc API va thieu map array giam tru | ✅ Da sua | Set dung data.data, viet ham extract cac truong giam tru tu array va them status submitted |
+| 5 | CORS tu choi ket noi tu browser local khi co slash/thay doi port | ✅ Da sua | Chuan hoa origin va cho phep cac port 3000/5000 |
 
 ---
 
@@ -234,6 +236,7 @@
 | 2026-06-30 | TaxDeclarePage, TaxHistoryPage, PaymentModal, ProfilePage, TaxCalculator | Phase 3 |
 | 2026-06-30 | ReportPage (Recharts), AdminPage (4 Tab), xuat PDF/Excel, TaxConfig dong | Phase 4 |
 | 2026-06-30 | Commit: "admin panel, reports, tax config" (b0c660b) | Phase 4 ✅ |
+| 2026-07-01 | Fix trang lich su khai bao, giam tru array mapping, loi CORS va seed.js | Phase 5.1/5.2 ✅ |
 
 ---
 

@@ -1,6 +1,6 @@
 /**
- * Script tao du lieu mau (chay 1 lan)
- * Lenh: node src/utils/seed.js
+ * Script tạo dữ liệu mẫu (chạy 1 lần)
+ * Lệnh: node src/utils/seed.js
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
@@ -10,46 +10,52 @@ const { TAX_BRACKETS, PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../co
 
 const seed = async () => {
   await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tax_system');
-  console.log('Connected to MongoDB');
+  console.log('Đã kết nối MongoDB');
 
-  // Tao admin
+  // Tạo tài khoản quản trị viên
   const existingAdmin = await User.findOne({ email: 'admin@taxvn.com' });
   if (!existingAdmin) {
     await User.create({
-      fullName: 'Quan tri vien',
+      fullName: 'Quản trị viên',
       email: 'admin@taxvn.com',
       password: 'Admin@123',
       role: 'admin',
     });
-    console.log('Admin created: admin@taxvn.com / Admin@123');
+    console.log('Đã tạo admin: admin@taxvn.com / Admin@123');
   }
 
-  // Tao user mau
+  // Tạo tài khoản người dùng mẫu
   const existingUser = await User.findOne({ email: 'user@taxvn.com' });
   if (!existingUser) {
     await User.create({
-      fullName: 'Nguyen Van A',
+      fullName: 'Nguyễn Văn A',
       email: 'user@taxvn.com',
       password: 'User@123',
-      taxCode: 'MST001234567',
+      taxCode: '0123456789',
       idNumber: '001234567890',
+      phone: '0912345678',
+      address: '123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
     });
-    console.log('User created: user@taxvn.com / User@123');
+    console.log('Đã tạo user: user@taxvn.com / User@123');
   }
 
-  // Tao cau hinh thue 2026
-  const existingConfig = await TaxConfig.findOne({ year: 2026 });
-  if (!existingConfig) {
-    await TaxConfig.create({
-      year: 2026,
-      personalDeduction: PERSONAL_DEDUCTION,
-      dependentDeduction: DEPENDENT_DEDUCTION,
-      taxBrackets: TAX_BRACKETS,
-    });
-    console.log('TaxConfig 2024 created');
+  // Tạo cấu hình thuế 2024, 2025, 2026
+  const yearsToSeed = [2024, 2025, 2026];
+  for (const yr of yearsToSeed) {
+    const existingConfig = await TaxConfig.findOne({ year: yr });
+    if (!existingConfig) {
+      await TaxConfig.create({
+        year: yr,
+        personalDeduction: PERSONAL_DEDUCTION,
+        dependentDeduction: DEPENDENT_DEDUCTION,
+        taxBrackets: TAX_BRACKETS,
+        isActive: true,
+      });
+      console.log(`Đã tạo cấu hình thuế năm ${yr}`);
+    }
   }
 
-  console.log('Seed hoan thanh!');
+  console.log('✅ Seed dữ liệu hoàn thành!');
   process.exit(0);
 };
 

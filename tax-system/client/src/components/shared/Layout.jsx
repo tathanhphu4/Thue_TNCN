@@ -8,10 +8,11 @@ const navItems = [
   { path: '/tax/calculator',  label: '🧮 Tính thuế',     roles: ['user'] },
   { path: '/tax/declare',     label: '📝 Khai báo thuế', roles: ['user'] },
   { path: '/tax/history',     label: '📋 Lịch sử',       roles: ['user'] },
-  { path: '/reports',         label: '📊 Báo cáo',       roles: ['user', 'admin'] },
+  { path: '/reports',         label: '📊 Báo cáo',       roles: ['user'] },
   { path: '/admin',           label: '⚙️ Quản trị',      roles: ['admin'] },
   { path: '/profile',         label: '👤 Hồ sơ',         roles: ['user', 'admin'] },
 ];
+
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
@@ -78,7 +79,7 @@ export default function Layout({ children }) {
         </nav>
         <div className="sidebar-footer">
           <p className="user-name" title={user?.email}>{user?.fullName}</p>
-          <p className="user-role">{user?.role === 'admin' ? '🔑 Quản trị viên' : '👤 Người dùng'}</p>
+          <p className="user-role">{user?.role === 'admin' ? '🔑 Quản trị viên' : '👤 Người nộp thuế'}</p>
           <button className="logout-btn" onClick={handleLogout}>Đăng xuất ↩</button>
         </div>
       </aside>

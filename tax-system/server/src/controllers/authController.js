@@ -26,8 +26,10 @@ exports.validateRegister = [
     .optional({ checkFalsy: true })
     .matches(/^(0[3|5|7|8|9])[0-9]{8}$/).withMessage('Số điện thoại không hợp lệ'),
 
+  // CCCD là BẮT BUỘC khi đăng ký và không thể thay đổi sau đó
   body('idCard')
-    .optional({ checkFalsy: true })
+    .trim()
+    .notEmpty().withMessage('Vui lòng nhập số CCCD')
     .matches(/^\d{9}$|^\d{12}$/).withMessage('CCCD phải có 9 hoặc 12 chữ số'),
 
   body('taxCode')
@@ -56,8 +58,14 @@ exports.register = async (req, res) => {
   if (!checkValidation(req, res)) return;
   try {
     const { fullName, email, password, phone, idCard, taxCode } = req.body;
+
+    // Kiểm tra email đã tồn tại
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ success: false, message: 'Email này đã được đăng ký. Vui lòng dùng email khác.' });
+
+    // Kiểm tra CCCD đã tồn tại
+    const existingCCCD = await User.findOne({ idNumber: idCard });
+    if (existingCCCD) return res.status(400).json({ success: false, message: 'Số CCCD này đã được đăng ký trong hệ thống.' });
 
     const user = await User.create({ fullName, email, password, phone, idNumber: idCard, taxCode });
     const token = signToken(user._id);
@@ -65,10 +73,21 @@ exports.register = async (req, res) => {
     res.status(201).json({
       success: true,
       token,
-      user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role }
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        idNumber: user.idNumber,
+        taxCode: user.taxCode,
+      }
     });
   } catch (err) {
     if (err.code === 11000) {
+      const field = Object.keys(err.keyPattern || {})[0];
+      if (field === 'idNumber') {
+        return res.status(400).json({ success: false, message: 'Số CCCD này đã được đăng ký trong hệ thống.' });
+      }
       return res.status(400).json({ success: false, message: 'Email hoặc CCCD đã tồn tại trong hệ thống.' });
     }
     res.status(500).json({ success: false, message: 'Lỗi đăng ký. Vui lòng thử lại.' });
@@ -92,7 +111,14 @@ exports.login = async (req, res) => {
     res.json({
       success: true,
       token,
-      user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role }
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        role: user.role,
+        idNumber: user.idNumber,
+        taxCode: user.taxCode,
+      }
     });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi đăng nhập. Vui lòng thử lại.' });
@@ -101,5 +127,10 @@ exports.login = async (req, res) => {
 
 // GET /api/auth/me
 exports.getMe = async (req, res) => {
-  res.json({ success: true, user: req.user });
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    res.json({ success: true, user });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi lấy thông tin người dùng.' });
+  }
 };

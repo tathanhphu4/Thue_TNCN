@@ -14,13 +14,26 @@ app.use(helmet());
 // CORS: cho phép origin từ env hoặc localhost khi development
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
-  : ['http://localhost:3000'];
+  : [
+      'http://localhost:3000',
+      'http://localhost:5000',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5000'
+    ];
 
 app.use(cors({
   origin: (origin, callback) => {
     // Cho phép curl / Postman / server-to-server (không có origin)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    
+    // Chuẩn hóa origin (bỏ dấu gạch chéo cuối nếu có)
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    const isAllowed = allowedOrigins.some(o => o.replace(/\/$/, '') === normalizedOrigin);
+    
+    if (isAllowed) {
+      return callback(null, true);
+    }
+    
     callback(new Error(`CORS: Origin ${origin} không được phép`));
   },
   credentials: true,

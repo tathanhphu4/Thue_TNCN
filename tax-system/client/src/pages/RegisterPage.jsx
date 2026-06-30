@@ -9,56 +9,50 @@ const initialForm = {
   password: '',
   confirmPassword: '',
   phone: '',
-  idCard: '',        // CCCD
-  taxCode: '',       // Mã số thuế (không bắt buộc)
+  idCard: '',   // Số CCCD - bắt buộc, không thể thay đổi sau khi đăng ký
+  taxCode: '',  // Mã số thuế - không bắt buộc
 };
 
 const validate = (form) => {
   const errors = {};
 
-  // Họ tên
   if (!form.fullName.trim()) {
     errors.fullName = 'Vui lòng nhập họ và tên';
   } else if (form.fullName.trim().length < 2) {
     errors.fullName = 'Họ tên phải có ít nhất 2 ký tự';
   }
 
-  // Email
   if (!form.email.trim()) {
-    errors.email = 'Vui lòng nhập email';
+    errors.email = 'Vui lòng nhập địa chỉ email';
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    errors.email = 'Email không hợp lệ';
+    errors.email = 'Địa chỉ email không hợp lệ';
   }
 
-  // Mật khẩu
   if (!form.password) {
     errors.password = 'Vui lòng nhập mật khẩu';
   } else if (form.password.length < 6) {
     errors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
   }
 
-  // Xác nhận mật khẩu
   if (!form.confirmPassword) {
     errors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
   } else if (form.password !== form.confirmPassword) {
     errors.confirmPassword = 'Mật khẩu xác nhận không khớp';
   }
 
-  // Số điện thoại
   if (!form.phone.trim()) {
     errors.phone = 'Vui lòng nhập số điện thoại';
   } else if (!/^(0[3|5|7|8|9])[0-9]{8}$/.test(form.phone.trim())) {
     errors.phone = 'Số điện thoại không hợp lệ (VD: 0912345678)';
   }
 
-  // CCCD
+  // CCCD bắt buộc
   if (!form.idCard.trim()) {
-    errors.idCard = 'Vui lòng nhập số CCCD';
+    errors.idCard = 'Vui lòng nhập số CCCD (bắt buộc)';
   } else if (!/^\d{9}$|^\d{12}$/.test(form.idCard.trim())) {
     errors.idCard = 'CCCD phải có 9 hoặc 12 chữ số';
   }
 
-  // Mã số thuế (không bắt buộc nhưng nếu nhập thì validate)
   if (form.taxCode && !/^\d{10}$|^\d{13}$/.test(form.taxCode.trim())) {
     errors.taxCode = 'Mã số thuế phải có 10 hoặc 13 chữ số';
   }
@@ -80,7 +74,6 @@ const RegisterPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
-    // Xoá lỗi của field khi user bắt đầu sửa
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -100,7 +93,6 @@ const RegisterPage = () => {
     const fieldErrors = validate(form);
     if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
-      // Scroll lên field lỗi đầu tiên
       const firstErrorField = document.querySelector('.input-error');
       if (firstErrorField) firstErrorField.focus();
       return;
@@ -132,16 +124,20 @@ const RegisterPage = () => {
       <div className="auth-card auth-card--wide">
         {/* Header */}
         <div className="auth-header">
-          <h1>💼 ThuếVN</h1>
-          <p>Hệ thống khai báo thuế TNCN trực tuyến</p>
+          <div className="auth-logo-wrapper">
+            <span className="auth-logo-icon">🏛️</span>
+          </div>
+          <h1>TaxVN</h1>
+          <p>Hệ thống khai báo thuế thu nhập cá nhân</p>
         </div>
 
-        <h2>Tạo tài khoản mới</h2>
+        <h2>Tạo tài khoản</h2>
 
         {/* Lỗi từ server */}
         {serverError && (
           <div className="alert alert-error" role="alert">
-            <span>⚠️</span> {serverError}
+            <span>⚠️</span>
+            <span>{serverError}</span>
           </div>
         )}
 
@@ -163,15 +159,13 @@ const RegisterPage = () => {
               autoComplete="name"
               disabled={loading}
             />
-            {errors.fullName && (
-              <p className="error-text">{errors.fullName}</p>
-            )}
+            {errors.fullName && <p className="error-text">⚠ {errors.fullName}</p>}
           </div>
 
           {/* Email */}
           <div className="form-group">
             <label className="form-label" htmlFor="email">
-              Email <span className="required">*</span>
+              Địa chỉ Email <span className="required">*</span>
             </label>
             <input
               id="email"
@@ -185,9 +179,7 @@ const RegisterPage = () => {
               autoComplete="email"
               disabled={loading}
             />
-            {errors.email && (
-              <p className="error-text">{errors.email}</p>
-            )}
+            {errors.email && <p className="error-text">⚠ {errors.email}</p>}
           </div>
 
           {/* Mật khẩu + Xác nhận — 2 cột */}
@@ -219,9 +211,7 @@ const RegisterPage = () => {
                   {showPass ? '🙈' : '👁️'}
                 </button>
               </div>
-              {errors.password && (
-                <p className="error-text">{errors.password}</p>
-              )}
+              {errors.password && <p className="error-text">⚠ {errors.password}</p>}
             </div>
 
             <div className="form-group">
@@ -251,9 +241,7 @@ const RegisterPage = () => {
                   {showConfirm ? '🙈' : '👁️'}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p className="error-text">{errors.confirmPassword}</p>
-              )}
+              {errors.confirmPassword && <p className="error-text">⚠ {errors.confirmPassword}</p>}
             </div>
           </div>
 
@@ -276,9 +264,7 @@ const RegisterPage = () => {
                 disabled={loading}
                 maxLength={10}
               />
-              {errors.phone && (
-                <p className="error-text">{errors.phone}</p>
-              )}
+              {errors.phone && <p className="error-text">⚠ {errors.phone}</p>}
             </div>
 
             <div className="form-group">
@@ -297,10 +283,16 @@ const RegisterPage = () => {
                 disabled={loading}
                 maxLength={12}
               />
-              {errors.idCard && (
-                <p className="error-text">{errors.idCard}</p>
-              )}
+              {errors.idCard && <p className="error-text">⚠ {errors.idCard}</p>}
             </div>
+          </div>
+
+          {/* Thông báo CCCD không thể thay đổi */}
+          <div className="auth-info-box">
+            <span className="info-icon">🔒</span>
+            <span>
+              <strong>Lưu ý quan trọng:</strong> Số CCCD sẽ được liên kết vĩnh viễn với tài khoản của bạn và <strong>không thể thay đổi</strong> sau khi đăng ký thành công. Vui lòng kiểm tra kỹ trước khi xác nhận.
+            </span>
           </div>
 
           {/* Mã số thuế (không bắt buộc) */}
@@ -321,9 +313,7 @@ const RegisterPage = () => {
               disabled={loading}
               maxLength={13}
             />
-            {errors.taxCode && (
-              <p className="error-text">{errors.taxCode}</p>
-            )}
+            {errors.taxCode && <p className="error-text">⚠ {errors.taxCode}</p>}
           </div>
 
           {/* Nút đăng ký */}
@@ -334,17 +324,17 @@ const RegisterPage = () => {
           >
             {loading ? (
               <>
-                <span className="spinner" /> Đang đăng ký...
+                <span className="spinner" /> Đang tạo tài khoản...
               </>
             ) : (
-              'Tạo tài khoản'
+              '✅ Tạo tài khoản'
             )}
           </button>
         </form>
 
         <p className="auth-link">
           Đã có tài khoản?{' '}
-          <Link to="/login">Đăng nhập ngay</Link>
+          <Link to="/login">Đăng nhập ngay →</Link>
         </p>
       </div>
     </div>

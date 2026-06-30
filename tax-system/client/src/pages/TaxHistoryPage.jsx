@@ -7,11 +7,19 @@ import { formatCurrency, formatDate } from "../utils/formatters";
 import "../styles/taxHistory.css";
 
 const STATUS_CONFIG = {
-  draft:    { label: "Nháp",        className: "status-draft",    icon: "📝" },
-  pending:  { label: "Chờ nộp",     className: "status-pending",  icon: "⏳" },
-  paid:     { label: "Đã nộp",      className: "status-paid",     icon: "✅" },
-  overdue:  { label: "Quá hạn",     className: "status-overdue",  icon: "🚨" },
-  rejected: { label: "Bị từ chối",  className: "status-rejected", icon: "❌" },
+  draft:      { label: "Nháp",        className: "status-draft",      icon: "📝" },
+  pending:    { label: "Chờ nộp",     className: "status-pending",    icon: "⏳" },
+  submitted:  { label: "Đã gửi",      className: "status-submitted",  icon: "📩" },
+  paid:       { label: "Đã nộp",      className: "status-paid",       icon: "✅" },
+  overdue:    { label: "Quá hạn",     className: "status-overdue",    icon: "🚨" },
+  rejected:   { label: "Bị từ chối",  className: "status-rejected",   icon: "❌" },
+};
+
+const INCOME_SOURCE_MAP = {
+  salary: "Tiền lương, tiền công",
+  business: "Kinh doanh",
+  investment: "Đầu tư vốn",
+  other: "Thu nhập khác",
 };
 
 const FILTER_OPTIONS = [
@@ -42,7 +50,7 @@ export default function TaxHistoryPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Không thể tải lịch sử.");
-      setDeclarations(data.declarations || data || []);
+      setDeclarations(data.data || data.declarations || data || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -77,7 +85,7 @@ export default function TaxHistoryPage() {
   const totalTax = declarations
     .filter((d) => d.status === "paid")
     .reduce((sum, d) => sum + (d.taxAmount || 0), 0);
-  const pendingCount = declarations.filter((d) => d.status === "pending" || d.status === "overdue").length;
+  const pendingCount = declarations.filter((d) => d.status === "pending" || d.status === "submitted" || d.status === "overdue").length;
 
   if (loading) return <LoadingSpinner variant="card" message="Đang tải lịch sử khai báo..." />;
 
@@ -185,7 +193,7 @@ export default function TaxHistoryPage() {
           {filtered.map((decl) => {
             const statusCfg = STATUS_CONFIG[decl.status] || STATUS_CONFIG.draft;
             const isExpanded = expandedId === decl._id;
-            const canPay = decl.status === "pending" || decl.status === "overdue";
+            const canPay = decl.status === "pending" || decl.status === "submitted" || decl.status === "overdue";
 
             return (
               <div key={decl._id} className={`decl-card ${canPay ? "can-pay" : ""}`}>
@@ -250,7 +258,7 @@ export default function TaxHistoryPage() {
                         {decl.incomes?.length > 0 ? (
                           decl.incomes.map((inc, i) => (
                             <div key={i} className="detail-row">
-                              <span>{inc.source || `Nguồn ${i + 1}`}</span>
+                              <span>{INCOME_SOURCE_MAP[inc.source] || inc.source || `Nguồn ${i + 1}`}</span>
                               <span>{formatCurrency(inc.amount || 0)}</span>
                             </div>
                           ))
@@ -261,26 +269,58 @@ export default function TaxHistoryPage() {
 
                       <div className="detail-section">
                         <h4>Giảm trừ</h4>
-                        <div className="detail-row">
-                          <span>Bản thân</span>
-                          <span>{formatCurrency(decl.deductions?.personal || 11000000)}</span>
-                        </div>
-                        {decl.deductions?.dependents > 0 && (
-                          <div className="detail-row">
-                            <span>Người phụ thuộc ({decl.deductions?.numDependents || 0} người)</span>
-                            <span>{formatCurrency(decl.deductions?.dependents || 0)}</span>
-                          </div>
-                        )}
-                        {decl.deductions?.insurance > 0 && (
-                          <div className="detail-row">
-                            <span>Bảo hiểm</span>
-                            <span>{formatCurrency(decl.deductions?.insurance || 0)}</span>
-                          </div>
-                        )}
-                        <div className="detail-row total-row">
-                          <span>Tổng giảm trừ</span>
-                          <span>{formatCurrency(decl.totalDeductions || 0)}</span>
-                        </div>
+                        {(() => {
+                          const depItem = decl.deductions?.find((d) => d.type === "dependent");
+                          const insItem = decl.deductions?.find((d) => d.type === "insurance");
+                          const charityItem = decl.deductions?.find((d) => d.type === "charity");
+                          const otherItem = decl.deductions?.find((d) => d.type === "other");
+
+                          const dependentsCount = depItem?.dependents || 0;
+                          const dependentsAmount = depItem?.amount || 0;
+                          const insuranceAmount = insItem?.amount || 0;
+                          const charityAmount = charityItem?.amount || 0;
+                          const otherAmount = otherItem?.amount || 0;
+
+                          const totalDeductionVal = decl.totalDeduction || 0;
+                          const personalDeductionVal = Math.max(0, totalDeductionVal - (dependentsAmount + insuranceAmount + charityAmount + otherAmount));
+
+                          return (
+                            <>
+                              <div className="detail-row">
+                                <span>Bản thân</span>
+                                <span>{formatCurrency(personalDeductionVal)}</span>
+                              </div>
+                              {dependentsCount > 0 && (
+                                <div className="detail-row">
+                                  <span>Người phụ thuộc ({dependentsCount} người)</span>
+                                  <span>{formatCurrency(dependentsAmount)}</span>
+                                </div>
+                              )}
+                              {insuranceAmount > 0 && (
+                                <div className="detail-row">
+                                  <span>Bảo hiểm</span>
+                                  <span>{formatCurrency(insuranceAmount)}</span>
+                                </div>
+                              )}
+                              {charityAmount > 0 && (
+                                <div className="detail-row">
+                                  <span>Từ thiện</span>
+                                  <span>{formatCurrency(charityAmount)}</span>
+                                </div>
+                              )}
+                              {otherAmount > 0 && (
+                                <div className="detail-row">
+                                  <span>Giảm trừ khác</span>
+                                  <span>{formatCurrency(otherAmount)}</span>
+                                </div>
+                              )}
+                              <div className="detail-row total-row">
+                                <span>Tổng giảm trừ</span>
+                                <span>{formatCurrency(totalDeductionVal)}</span>
+                              </div>
+                            </>
+                          );
+                        })()}
                       </div>
 
                       <div className="detail-section">

@@ -4,27 +4,15 @@ import "../../styles/paymentModal.css";
 const PAYMENT_METHODS = [
   {
     id: "bank_transfer",
-    label: "Chuyển khoản ngân hàng",
+    label: "Chuyển khoản Kho bạc Nhà nước",
     icon: "🏦",
-    desc: "Chuyển khoản qua tài khoản kho bạc nhà nước",
+    desc: "Chuyển khoản qua tài khoản ngân hàng của Kho bạc Nhà nước",
   },
   {
     id: "internet_banking",
-    label: "Internet Banking",
-    icon: "💻",
-    desc: "Thanh toán qua cổng ngân hàng trực tuyến",
-  },
-  {
-    id: "momo",
-    label: "Ví MoMo",
+    label: "Thanh toán bằng QR Code",
     icon: "📱",
-    desc: "Thanh toán qua ví điện tử MoMo",
-  },
-  {
-    id: "vnpay",
-    label: "VNPay",
-    icon: "💳",
-    desc: "Thanh toán qua cổng VNPay",
+    desc: "Quét mã QR để chuyển khoản nhanh",
   },
 ];
 
@@ -36,6 +24,14 @@ export default function PaymentModal({ declaration, onClose, onSuccess }) {
   const [step, setStep] = useState(1); // 1: chon phuong thuc, 2: xac nhan, 3: thanh cong
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [qrLoaded, setQrLoaded] = useState(true);
+  const [copiedField, setCopiedField] = useState("");
+
+  const handleCopy = (text, field) => {
+    navigator.clipboard.writeText(text);
+    setCopiedField(field);
+    setTimeout(() => setCopiedField(""), 2000);
+  };
 
   const handleConfirmPayment = async () => {
     if (!selectedMethod) {
@@ -197,6 +193,84 @@ export default function PaymentModal({ declaration, onClose, onSuccess }) {
                   ⚠️ Sau khi xác nhận, giao dịch sẽ được ghi nhận và không thể hoàn tác.
                 </div>
               </div>
+
+              {selectedMethod === "bank_transfer" && (
+                <div className="payment-instructions-box">
+                  <h4>🏦 Thông tin tài khoản Kho bạc Nhà nước:</h4>
+                  <div className="instruction-row">
+                    <span>Ngân hàng:</span>
+                    <strong>VietinBank (Ngân hàng TMCP Công Thương VN)</strong>
+                  </div>
+                  <div className="instruction-row">
+                    <span>Số tài khoản:</span>
+                    <strong 
+                      className="clickable-text" 
+                      onClick={() => handleCopy("112000999999", "account")}
+                      title="Click để sao chép"
+                    >
+                      112000999999 {copiedField === "account" ? "✅ Đã sao chép!" : "📋 Sao chép"}
+                    </strong>
+                  </div>
+                  <div className="instruction-row">
+                    <span>Tên tài khoản:</span>
+                    <strong>KHO BẠC NHÀ NƯỚC HÀ NỘI</strong>
+                  </div>
+                  <div className="instruction-row">
+                    <span>Nội dung chuyển khoản:</span>
+                    <strong 
+                      className="clickable-text" 
+                      onClick={() => handleCopy(`NOP THUE ${declId}`, "content")}
+                      title="Click để sao chép"
+                    >
+                      NOP THUE {declId} {copiedField === "content" ? "✅ Đã sao chép!" : "📋 Sao chép"}
+                    </strong>
+                  </div>
+                  <div className="instruction-row">
+                    <span>Số tiền:</span>
+                    <strong className="text-danger">{formatCurrency(taxAmount)}</strong>
+                  </div>
+                  <small className="instruction-tip">
+                    * Bấm vào số tài khoản hoặc nội dung để sao chép nhanh.
+                  </small>
+                </div>
+              )}
+
+              {selectedMethod === "internet_banking" && (
+                <div className="payment-instructions-box text-center">
+                  <h4>📱 Quét mã QR dưới đây để thanh toán:</h4>
+                  <div className="qr-container">
+                    {qrLoaded ? (
+                      <img
+                        src="/images/qr_payment.png"
+                        alt="Mã QR Kho bạc Nhà nước"
+                        className="qr-image"
+                        onError={() => setQrLoaded(false)}
+                      />
+                    ) : (
+                      <div className="qr-placeholder-card">
+                        <span className="qr-placeholder-icon">🔲</span>
+                        <p>Mã QR chưa được tải</p>
+                        <small>Vui lòng upload hình ảnh QR của bạn vào đường dẫn:</small>
+                        <code>client/public/images/qr_payment.png</code>
+                      </div>
+                    )}
+                  </div>
+                  <div className="instruction-row mt-2">
+                    <span>Nội dung:</span>
+                    <strong 
+                      className="clickable-text" 
+                      onClick={() => handleCopy(`NOP THUE ${declId}`, "content_qr")}
+                      title="Click để sao chép"
+                    >
+                      NOP THUE {declId} {copiedField === "content_qr" ? "✅ Đã chép!" : "📋 Chép"}
+                    </strong>
+                  </div>
+                  <div className="instruction-row">
+                    <span>Số tiền:</span>
+                    <strong className="text-danger">{formatCurrency(taxAmount)}</strong>
+                  </div>
+                </div>
+              )}
 
               {error && <p className="modal-error">{error}</p>}
 

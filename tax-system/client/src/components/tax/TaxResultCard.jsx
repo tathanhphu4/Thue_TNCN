@@ -33,7 +33,7 @@ const TaxResultCard = ({ result }) => {
         {/* Thu nhập & khấu trừ */}
         <div className="result-section">
           <p className="result-section-title">Thu nhập & Khấu trừ</p>
-          <Row label="Thu nhập brutto (tháng)" value={grossIncome} />
+          <Row label="Thu nhập tháng" value={grossIncome} />
           <Row label="Bảo hiểm (10.5%)" value={insurance} />
           <Row label="Giảm trừ bản thân" value={personalDeduction} />
           <Row label="Giảm trừ người phụ thuộc" value={dependentDeduction} />

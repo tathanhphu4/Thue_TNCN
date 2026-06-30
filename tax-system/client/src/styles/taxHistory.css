@@ -228,6 +228,7 @@
 }
 .status-draft    { background: #f3f4f6; color: #6b7280; }
 .status-pending  { background: #fef3c7; color: #92400e; }
+.status-submitted { background: #dbeafe; color: #1e40af; }
 .status-paid     { background: #dcfce7; color: #166534; }
 .status-overdue  { background: #fee2e2; color: #991b1b; }
 .status-rejected { background: #fce7f3; color: #9d174d; }

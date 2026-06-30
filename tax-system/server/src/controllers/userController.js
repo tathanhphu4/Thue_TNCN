@@ -13,9 +13,11 @@ exports.getAllUsers = async (req, res) => {
 // PUT /api/users/profile
 exports.updateProfile = async (req, res) => {
   try {
+    // Chỉ cho phép cập nhật các trường an toàn, KHÔNG bao gồm idNumber và taxCode
     const { fullName, phone, address, dateOfBirth } = req.body;
     const user = await User.findByIdAndUpdate(
-      req.user._id, { fullName, phone, address, dateOfBirth },
+      req.user._id,
+      { fullName, phone, address, dateOfBirth },
       { new: true, runValidators: true }
     ).select('-password');
     res.json({ success: true, data: user });
@@ -79,4 +81,3 @@ exports.toggleUserStatus = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-

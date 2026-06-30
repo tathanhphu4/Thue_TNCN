@@ -179,7 +179,7 @@ export default function ProfilePage() {
   if (loading) return <LoadingSpinner message="Đang tải thông tin hồ sơ..." />;
 
   const avatarChar = user?.fullName?.charAt(0)?.toUpperCase() || "?";
-  const userRoleText = user?.role === "admin" ? "⚙️ Quản trị viên" : "👤 Người nộp thuế";
+  const userRoleText = user?.role === 'admin' ? '⚙️ Quản trị viên' : '👤 Người nộp thuế';
 
   return (
     <div className="page-container">
@@ -309,19 +309,34 @@ export default function ProfilePage() {
                     />
                   </div>
 
-                  {/* CCCD (Readonly) */}
+                  {/* CCCD - Vĩnh viễn, không thể thay đổi */}
                   <div className="form-group">
-                    <label htmlFor="idNumber">Số CCCD / CMND</label>
+                    <label htmlFor="idNumber" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      Số CCCD / CMND
+                      <span style={{
+                        fontSize: '0.7rem',
+                        background: '#fee2e2',
+                        color: '#b91c1c',
+                        padding: '0.1rem 0.45rem',
+                        borderRadius: '12px',
+                        fontWeight: 600,
+                        letterSpacing: '0.3px'
+                      }}>🔒 Không thể thay đổi</span>
+                    </label>
                     <div className="profile-input-wrapper">
                       <input
                         type="text"
                         id="idNumber"
-                        value={user?.idNumber || user?.idCard || "Chưa cập nhật"}
+                        value={user?.idNumber || 'Chưa cập nhật'}
                         readOnly
                         className="input-read-only"
+                        style={{ fontFamily: 'monospace', letterSpacing: '1px' }}
                       />
-                      <span className="input-lock-icon" title="Không thể tự thay đổi CCCD">🔒</span>
+                      <span className="input-lock-icon" title="CCCD được liên kết vĩnh viễn khi đăng ký, không thể thay đổi">🔒</span>
                     </div>
+                    <p style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.3rem' }}>
+                      Số CCCD được liên kết vĩnh viễn với tài khoản của bạn.
+                    </p>
                   </div>
 
                   {/* Mã số thuế (Readonly) */}
@@ -331,11 +346,12 @@ export default function ProfilePage() {
                       <input
                         type="text"
                         id="taxCode"
-                        value={user?.taxCode || "Chưa cập nhật"}
+                        value={user?.taxCode || 'Chưa cập nhật'}
                         readOnly
                         className="input-read-only"
+                        style={{ fontFamily: 'monospace', letterSpacing: '1px' }}
                       />
-                      <span className="input-lock-icon" title="Liên hệ chi cục thuế để cập nhật MST">🔒</span>
+                      <span className="input-lock-icon" title="Liên hệ chi cục thuế để cập nhật mã số thuế">🔒</span>
                     </div>
                   </div>
 
