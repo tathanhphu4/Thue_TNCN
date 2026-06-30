@@ -1,0 +1,276 @@
+.admin-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Tabs */
+.admin-tabs {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: var(--shadow);
+  gap: 0.25rem;
+}
+
+.admin-tab {
+  flex: 1;
+  padding: 0.85rem 1rem;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.admin-tab:hover {
+  background: #f1f5f9;
+  color: var(--primary);
+}
+
+.admin-tab.active {
+  background: var(--secondary);
+  color: white;
+}
+
+/* Card layout */
+.admin-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  border: 1px solid #eef2f5;
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.admin-card-header h2 {
+  font-size: 1.3rem;
+  color: var(--primary);
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Search and filters bar */
+.admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-search-input {
+  padding: 0.6rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  width: 280px;
+  outline: none;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.admin-search-input:focus {
+  border-color: var(--secondary);
+}
+
+.admin-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.admin-filter-select {
+  padding: 0.5rem 0.8rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  font-size: 0.9rem;
+  background: white;
+}
+
+/* Action buttons */
+.btn-export-excel {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s;
+}
+
+.btn-export-excel:hover {
+  opacity: 0.95;
+}
+
+.btn-status-toggle {
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-status-toggle.lock {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.btn-status-toggle.lock:hover {
+  background: #fca5a5;
+}
+
+.btn-status-toggle.unlock {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.btn-status-toggle.unlock:hover {
+  background: #a7f3d0;
+}
+
+/* Table columns tweaks */
+.admin-table th {
+  font-weight: 650;
+  background: #f8fafc;
+}
+
+.admin-table td {
+  vertical-align: middle;
+}
+
+/* Config Bracket Row styling */
+.bracket-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 60px;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.bracket-row-grid input {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.bracket-row-grid input:focus {
+  border-color: var(--secondary);
+}
+
+.btn-remove-bracket {
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  height: 38px;
+  width: 38px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  transition: background 0.2s;
+}
+
+.btn-remove-bracket:hover {
+  background: #fca5a5;
+}
+
+.btn-add-bracket {
+  background: #f0f4f8;
+  color: var(--secondary);
+  border: 2px dashed var(--border);
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s;
+}
+
+.btn-add-bracket:hover {
+  background: #e1eaf4;
+  border-color: var(--secondary);
+}
+
+/* Overall report dashboard style */
+.admin-stats-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: var(--shadow);
+  border-left: 4px solid var(--secondary);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-stat-icon-wrapper {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.admin-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-stat-title {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.admin-stat-num {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0.2rem 0 0;
+}

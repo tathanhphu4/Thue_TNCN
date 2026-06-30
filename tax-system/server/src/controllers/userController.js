@@ -55,3 +55,28 @@ exports.changePassword = async (req, res) => {
   }
 };
 
+// PUT /api/users/:id/toggle-status (admin: khóa/mở khóa tài khoản)
+exports.toggleUserStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(400).json({ success: false, message: 'Không thể khóa tài khoản quản trị viên' });
+    }
+
+    user.isActive = !user.isActive;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: `${user.isActive ? 'Mở khóa' : 'Khóa'} tài khoản thành công`,
+      data: { _id: user._id, fullName: user.fullName, email: user.email, isActive: user.isActive }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+

@@ -41,7 +41,7 @@ const seed = async () => {
   const existingConfig = await TaxConfig.findOne({ year: 2026 });
   if (!existingConfig) {
     await TaxConfig.create({
-      year: 2024,
+      year: 2026,
       personalDeduction: PERSONAL_DEDUCTION,
       dependentDeduction: DEPENDENT_DEDUCTION,
       taxBrackets: TAX_BRACKETS,

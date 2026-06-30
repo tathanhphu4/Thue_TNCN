@@ -5,13 +5,14 @@ const { TAX_BRACKETS } = require('../config/taxRules');
  * @param {number} taxableIncome - Thu nhập tính thuế (sau giảm trừ)
  * @returns {{ totalTax: number, brackets: Array }}
  */
-const calculateTax = (taxableIncome) => {
+const calculateTax = (taxableIncome, customBrackets = null) => {
   if (taxableIncome <= 0) return { totalTax: 0, brackets: [] };
 
   let totalTax = 0;
   const brackets = [];
+  const activeBrackets = customBrackets && customBrackets.length > 0 ? customBrackets : TAX_BRACKETS;
 
-  for (const bracket of TAX_BRACKETS) {
+  for (const bracket of activeBrackets) {
     if (taxableIncome <= bracket.min) break;
 
     const upper    = bracket.max !== null ? bracket.max : Infinity;

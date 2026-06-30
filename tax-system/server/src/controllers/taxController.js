@@ -2,15 +2,29 @@ const TaxDeclaration = require('../models/TaxDeclaration');
 const { calculateTax, calculateTaxableIncome } = require('../utils/taxCalculator');
 const { PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../config/taxRules');
 
+const TaxConfig = require('../models/TaxConfig');
+
 // POST /api/tax/calculate  (tính thuế không lưu)
 exports.calculate = async (req, res) => {
   try {
-    const { totalIncome, dependents = 0, otherDeductions = 0 } = req.body;
+    const { totalIncome, dependents = 0, otherDeductions = 0, year = 2024 } = req.body;
+    
+    let personalDeduction = PERSONAL_DEDUCTION;
+    let dependentDeduction = DEPENDENT_DEDUCTION;
+    let taxBrackets = null;
+
+    const config = await TaxConfig.findOne({ year: parseInt(year), isActive: true });
+    if (config) {
+      personalDeduction = config.personalDeduction;
+      dependentDeduction = config.dependentDeduction;
+      taxBrackets = config.taxBrackets;
+    }
+
     const taxableIncome = calculateTaxableIncome({
-      totalIncome, personalDeduction: PERSONAL_DEDUCTION,
-      dependents, dependentDeduction: DEPENDENT_DEDUCTION, otherDeductions
+      totalIncome, personalDeduction,
+      dependents, dependentDeduction, otherDeductions
     });
-    const { totalTax, brackets } = calculateTax(taxableIncome);
+    const { totalTax, brackets } = calculateTax(taxableIncome, taxBrackets);
     res.json({ success: true, data: { totalIncome, taxableIncome, totalTax, brackets } });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -27,13 +41,24 @@ exports.declare = async (req, res) => {
     const dependents     = deductions.find(d => d.type === 'dependent')?.dependents || 0;
     const otherDeductions = deductions.filter(d => d.type !== 'dependent').reduce((s, d) => s + d.amount, 0);
 
-    const taxableIncome = calculateTaxableIncome({
-      totalIncome, personalDeduction: PERSONAL_DEDUCTION,
-      dependents, dependentDeduction: DEPENDENT_DEDUCTION, otherDeductions
-    });
-    const { totalTax, brackets } = calculateTax(taxableIncome);
+    let personalDeduction = PERSONAL_DEDUCTION;
+    let dependentDeduction = DEPENDENT_DEDUCTION;
+    let taxBrackets = null;
 
-    const totalDeduction = PERSONAL_DEDUCTION + dependents * DEPENDENT_DEDUCTION + otherDeductions;
+    const config = await TaxConfig.findOne({ year: parseInt(year), isActive: true });
+    if (config) {
+      personalDeduction = config.personalDeduction;
+      dependentDeduction = config.dependentDeduction;
+      taxBrackets = config.taxBrackets;
+    }
+
+    const taxableIncome = calculateTaxableIncome({
+      totalIncome, personalDeduction,
+      dependents, dependentDeduction, otherDeductions
+    });
+    const { totalTax, brackets } = calculateTax(taxableIncome, taxBrackets);
+
+    const totalDeduction = personalDeduction + dependents * dependentDeduction + otherDeductions;
 
     const declaration = await TaxDeclaration.create({
       user: req.user._id, year, month, declarationType,
@@ -100,6 +125,16 @@ exports.payDeclaration = async (req, res) => {
     await declaration.save();
 
     res.json({ success: true, data: declaration });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// GET /api/tax/admin/declarations (admin: lấy tất cả tờ khai)
+exports.getAllDeclarations = async (req, res) => {
+  try {
+    const declarations = await TaxDeclaration.find().populate('user').sort({ createdAt: -1 });
+    res.json({ success: true, data: declarations });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
