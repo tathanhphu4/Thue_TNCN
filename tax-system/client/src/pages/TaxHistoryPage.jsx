@@ -63,12 +63,12 @@ export default function TaxHistoryPage() {
   };
 
   // Years available
-  const years = [...new Set(declarations.map((d) => d.year || d.taxYear))].sort((a, b) => b - a);
+  const years = [...new Set(declarations.map((d) => d.year))].sort((a, b) => b - a);
 
   // Filter
   const filtered = declarations.filter((d) => {
     const matchStatus = filterStatus === "all" || d.status === filterStatus;
-    const matchYear = filterYear === "all" || String(d.year || d.taxYear) === filterYear;
+    const matchYear = filterYear === "all" || String(d.year) === filterYear;
     return matchStatus && matchYear;
   });
 
@@ -185,7 +185,7 @@ export default function TaxHistoryPage() {
                 <div className="decl-main" onClick={() => setExpandedId(isExpanded ? null : decl._id)}>
                   <div className="decl-left">
                     <div className="decl-id">
-                      <span className="decl-year">Năm {decl.year || decl.taxYear}</span>
+                      <span className="decl-year">Năm {decl.year}</span>
                       <span className="decl-code">#{decl._id?.slice(-6).toUpperCase()}</span>
                     </div>
                     <div className="decl-meta">

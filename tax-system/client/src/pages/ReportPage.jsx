@@ -22,7 +22,7 @@ export default function ReportPage() {
   // Tổng hợp theo năm
   const byYear = {};
   declarations.forEach(d => {
-    const y = d.year || d.taxYear || '?';
+    const y = d.year || '?';
     if (!byYear[y]) byYear[y] = { declarations: [], totalIncome: 0, totalTax: 0 };
     byYear[y].declarations.push(d);
     byYear[y].totalIncome += d.totalIncome || 0;

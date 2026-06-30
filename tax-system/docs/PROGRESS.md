@@ -127,19 +127,20 @@
 - [ ] Component DeductionForm.jsx
 - [ ] Component TaxPreview.jsx
 
-### 3.4 Nop thue
-- [ ] TaxHistoryPage.jsx hien thi danh sach day du
-- [ ] Nut "Nop thue" tren moi khai bao
-- [ ] Modal xac nhan nop thue
-- [ ] Chon phuong thuc thanh toan
-- [ ] Cap nhat trang thai sang "paid"
-- [ ] Component PaymentModal.jsx
+### 3.4 Nộp thuế [DONE]
+- [x] TaxHistoryPage.jsx hiển thị danh sách đầy đủ (filter trạng thái/năm, expand chi tiết, stat cards)
+- [x] Nút "Nộp thuế" trên mỗi khai báo (chỉ hiện với status pending/overdue)
+- [x] Modal xác nhận nộp thuế (PaymentModal - 3 bước: chọn phương thức -> xác nhận -> thành công)
+- [x] Chọn phương thức thanh toán (bank_transfer, internet_banking, momo, vnpay)
+- [x] Cập nhật trạng thái sang "paid" (backend: payDeclaration trong taxController.js)
+- [x] Component PaymentModal.jsx + paymentModal.css
+- [x] CAN FIX: TaxHistoryPage dùng `declaration.taxYear`, schema thực tế là `year` -> đã sửa đổi
 
-### 3.5 ProfilePage
-- [ ] Hien thi thong tin ca nhan
-- [ ] Form cap nhat (ten, SDT, dia chi, ngay sinh)
-- [ ] Hien thi ma so thue
-- [ ] Doi mat khau
+### 3.5 ProfilePage [DONE]
+- [x] Hiển thị thông tin cá nhân đầy đủ (Họ tên, email, CCCD, MST)
+- [x] Form cập nhật thông tin cá nhân (Họ tên, SĐT, địa chỉ, ngày sinh)
+- [x] Hiển thị mã số thuế & CCCD (chế độ chỉ đọc bảo mật có biểu tượng khóa 🔒)
+- [x] Đổi mật khẩu tài khoản (Form bảo mật tại Tab riêng)
 
 ---
 
@@ -201,7 +202,8 @@
 
 | STT | Van de | Trang thai | Ghi chu |
 |-----|--------|------------|---------|
-| - | - | - | - |
+| 1 | TaxHistoryPage dung `taxYear` nhung schema TaxDeclaration dung `year` | Đã sửa | Sửa các fallback d.taxYear thành d.year ở frontend |
+| 2 | Model Payment khong duoc dung trong payDeclaration | Đã quyết định | Đơn giản hóa, cập nhật trực tiếp trạng thái của TaxDeclaration |
 
 ---
 
@@ -210,7 +212,8 @@
 
 | Ngay | Viec da lam | Phase |
 |------|-------------|-------|
-| [HOm nay] | Tao khung du an, cac file co ban | Phase 0-2 |
+| 2026-06-30 | Tạo khung dự án, các file cơ bản | Phase 0-2 |
+| 2026-06-30 | Sửa trường taxYear -> year, triển khai trang ProfilePage đầy đủ chức năng và API đổi mật khẩu | Phase 3.4, 3.5 |
 
 ---
 
@@ -231,8 +234,7 @@ npm run install:all
 ```
 
 ## MUC TIEU SESSION TIEP THEO
-- [ ] Push len Git thanh cong
-- [ ] Chay npm run install:all khong loi
-- [ ] Server ket noi MongoDB
-- [ ] Test API /api/health tra ve OK
-- [ ] Login page hien thi dung
+- [ ] Hoàn thành Phase 3.1 (Đăng ký / Đăng nhập: validate & hiển thị lỗi từ server)
+- [ ] Hoàn thành Phase 3.2 (Máy tính thuế: TaxBracketTable, TaxResultCard)
+- [ ] Hoàn thành Phase 3.3 (Khai báo thuế: Form động thêm nhiều nguồn thu nhập & giảm trừ)
+- [ ] Bắt đầu Phase 4.1 (Báo cáo cá nhân: Biểu đồ Recharts, xuất PDF cá nhân)
