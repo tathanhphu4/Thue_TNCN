@@ -2,6 +2,7 @@ const router = require('express').Router();
 const { protect, adminOnly } = require('../middleware/auth');
 const TaxConfig = require('../models/TaxConfig');
 const { TAX_BRACKETS, PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../config/taxRules');
+const { handleControllerError } = require('../utils/errorHelpers');
 
 // GET /api/config/tax-rules
 router.get('/tax-rules', protect, async (req, res) => {
@@ -31,7 +32,7 @@ router.get('/tax-rules', protect, async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lấy cấu hình thuế.');
   }
 });
 
@@ -67,7 +68,7 @@ router.put('/tax-rules', protect, adminOnly, async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi cập nhật cấu hình thuế.');
   }
 });
 

@@ -1,14 +1,18 @@
 const TaxDeclaration = require('../models/TaxDeclaration');
 const { calculateTax, calculateTaxableIncome } = require('../utils/taxCalculator');
 const { PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../config/taxRules');
-
 const TaxConfig = require('../models/TaxConfig');
+const { handleControllerError } = require('../utils/errorHelpers');
 
 // POST /api/tax/calculate  (tính thuế không lưu)
 exports.calculate = async (req, res) => {
   try {
     const { totalIncome, dependents = 0, otherDeductions = 0, year = 2024 } = req.body;
-    
+
+    if (totalIncome == null || typeof totalIncome !== 'number' || totalIncome < 0) {
+      return res.status(400).json({ success: false, message: 'Vui lòng nhập tổng thu nhập hợp lệ (số không âm).' });
+    }
+
     let personalDeduction = PERSONAL_DEDUCTION;
     let dependentDeduction = DEPENDENT_DEDUCTION;
     let taxBrackets = null;
@@ -27,7 +31,7 @@ exports.calculate = async (req, res) => {
     const { totalTax, brackets } = calculateTax(taxableIncome, taxBrackets);
     res.json({ success: true, data: { totalIncome, taxableIncome, totalTax, brackets } });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi tính thuế. Vui lòng thử lại.');
   }
 };
 
@@ -36,6 +40,16 @@ exports.calculate = async (req, res) => {
 exports.declare = async (req, res) => {
   try {
     const { year, month, declarationType, incomes, deductions } = req.body;
+
+    if (!year || !declarationType) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp năm và loại khai báo.' });
+    }
+    if (!Array.isArray(incomes) || incomes.length === 0) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp ít nhất một nguồn thu nhập.' });
+    }
+    if (!Array.isArray(deductions)) {
+      return res.status(400).json({ success: false, message: 'Dữ liệu giảm trừ không hợp lệ.' });
+    }
 
     const totalIncome    = incomes.reduce((s, i) => s + i.amount, 0);
     const dependents     = deductions.find(d => d.type === 'dependent')?.dependents || 0;
@@ -69,7 +83,7 @@ exports.declare = async (req, res) => {
 
     res.status(201).json({ success: true, data: declaration });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lưu khai báo. Vui lòng thử lại.');
   }
 };
 
@@ -79,7 +93,7 @@ exports.getDeclarations = async (req, res) => {
     const declarations = await TaxDeclaration.find({ user: req.user._id }).sort({ createdAt: -1 });
     res.json({ success: true, data: declarations });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lấy danh sách khai báo.');
   }
 };
 
@@ -90,7 +104,7 @@ exports.getDeclaration = async (req, res) => {
     if (!declaration) return res.status(404).json({ success: false, message: 'Không tìm thấy' });
     res.json({ success: true, data: declaration });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lấy chi tiết khai báo.');
   }
 };
 // POST /api/tax/declarations/:id/pay
@@ -126,7 +140,7 @@ exports.payDeclaration = async (req, res) => {
 
     res.json({ success: true, data: declaration });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi nộp thuế. Vui lòng thử lại.');
   }
 };
 
@@ -136,6 +150,6 @@ exports.getAllDeclarations = async (req, res) => {
     const declarations = await TaxDeclaration.find().populate('user').sort({ createdAt: -1 });
     res.json({ success: true, data: declarations });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lấy tất cả tờ khai.');
   }
 };

@@ -113,7 +113,9 @@ const TaxCalculatorPage = () => {
         grossIncome:    Number(form.grossIncome),
         dependents:     Number(form.dependents) || 0,
         otherDeduction: Number(form.otherDeduction) || 0,
-      }).catch(() => {}); // Bỏ qua lỗi API, vẫn hiển thị kết quả
+      }).catch((err) => {
+        console.error('Lỗi gọi API tính thuế:', err?.message || err);
+      });
 
     } finally {
       setLoading(false);
