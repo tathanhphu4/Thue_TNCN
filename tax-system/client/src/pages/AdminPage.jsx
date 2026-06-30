@@ -5,6 +5,7 @@ import { taxService } from '../services/taxService';
 import { reportService } from '../services/reportService';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorMessage from '../components/shared/ErrorMessage';
+import EmptyState from '../components/shared/EmptyState';
 import { formatCurrency, formatDate } from '../utils/formatters';
 import {
   ResponsiveContainer,
@@ -252,7 +253,12 @@ export default function AdminPage() {
 
       {error && <ErrorMessage message={error} onRetry={loadData} />}
 
-      {!loading && (
+      {loading ? (
+        <LoadingSpinner
+          variant={activeTab === 'reports' ? 'dashboard' : 'table'}
+          message="Đang tải dữ liệu phân tích..."
+        />
+      ) : (
         <>
           {/* TAB 1: Danh sách người dùng */}
           {activeTab === 'users' && (
@@ -269,7 +275,11 @@ export default function AdminPage() {
               </div>
 
               {filteredUsers.length === 0 ? (
-                <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Không có người dùng nào khớp.</p>
+                <EmptyState
+                  icon="🔍"
+                  title="Không tìm thấy người dùng"
+                  message="Không tìm thấy người nộp thuế nào khớp với từ khóa tìm kiếm của bạn."
+                />
               ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table className="data-table admin-table">
@@ -368,7 +378,11 @@ export default function AdminPage() {
               </div>
 
               {filteredDeclarations.length === 0 ? (
-                <p style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>Không có tờ khai nào phù hợp.</p>
+                <EmptyState
+                  icon="📭"
+                  title="Không tìm thấy tờ khai"
+                  message="Không có tờ khai thuế nào khớp với bộ lọc hiện tại của bạn."
+                />
               ) : (
                 <div style={{ overflowX: 'auto' }}>
                   <table className="data-table admin-table">

@@ -17,7 +17,7 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <LoadingSpinner variant="dashboard" message="Đang tải tổng quan..." />;
 
   const totalTax  = declarations.reduce((s, d) => s + d.taxAmount, 0);
   const paidCount = declarations.filter(d => d.status === 'paid').length;

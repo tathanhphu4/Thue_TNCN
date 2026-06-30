@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import PaymentModal from "../components/tax/PaymentModal";
 import LoadingSpinner from "../components/shared/LoadingSpinner";
 import ErrorMessage from "../components/shared/ErrorMessage";
+import EmptyState from "../components/shared/EmptyState";
 import { formatCurrency, formatDate } from "../utils/formatters";
 import "../styles/taxHistory.css";
 
@@ -78,7 +79,7 @@ export default function TaxHistoryPage() {
     .reduce((sum, d) => sum + (d.taxAmount || 0), 0);
   const pendingCount = declarations.filter((d) => d.status === "pending" || d.status === "overdue").length;
 
-  if (loading) return <LoadingSpinner message="Đang tải lịch sử khai báo..." />;
+  if (loading) return <LoadingSpinner variant="card" message="Đang tải lịch sử khai báo..." />;
 
   return (
     <div className="tax-history-page">
@@ -165,13 +166,20 @@ export default function TaxHistoryPage() {
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="history-empty">
-          <span>📭</span>
-          <p>Không có khai báo nào phù hợp.</p>
-          {filterStatus === "all" && filterYear === "all" && (
-            <small>Bắt đầu bằng cách tạo khai báo thuế mới.</small>
-          )}
-        </div>
+        <EmptyState
+          icon="📭"
+          title="Không tìm thấy tờ khai thuế"
+          message={
+            filterStatus === "all" && filterYear === "all"
+              ? "Bạn chưa thực hiện khai báo thuế nào trong hệ thống."
+              : "Không tìm thấy tờ khai thuế nào khớp với bộ lọc của bạn."
+          }
+          action={
+            filterStatus === "all" && filterYear === "all"
+              ? { label: "+ Tạo khai báo mới", onClick: () => window.location.href = "/tax/declare" }
+              : null
+          }
+        />
       ) : (
         <div className="declaration-list">
           {filtered.map((decl) => {

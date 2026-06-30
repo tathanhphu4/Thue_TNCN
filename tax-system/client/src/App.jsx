@@ -1,8 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import PrivateRoute from './components/shared/PrivateRoute';
-import AdminRoute  from './components/shared/AdminRoute';
+import PrivateRoute   from './components/shared/PrivateRoute';
+import AdminRoute     from './components/shared/AdminRoute';
+import ErrorBoundary  from './components/shared/ErrorBoundary';
 
 // Pages
 import LoginPage    from './pages/LoginPage';
@@ -18,8 +19,9 @@ import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Routes>
         {/* Public */}
         <Route path="/login"    element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -40,9 +42,10 @@ function App() {
           <Route path="/admin" element={<AdminPage />} />
         </Route>
 
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </AuthProvider>
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
