@@ -284,7 +284,9 @@ function UserDashboard() {
   useEffect(() => {
     taxService.getDeclarations()
       .then(d => setDeclarations(d?.data || []))
-      .catch(() => {})
+      .catch((err) => {
+        console.error('Lỗi tải khai báo:', err?.message || err);
+      })
       .finally(() => setLoading(false));
   }, []);
 
