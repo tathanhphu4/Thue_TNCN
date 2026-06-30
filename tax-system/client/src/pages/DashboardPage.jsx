@@ -6,6 +6,8 @@ import { reportService } from '../services/reportService';
 import { userService } from '../services/userService';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { getStatusConfig } from '../utils/statusConfig';
+import { countDeclarationsByYear } from '../utils/chartHelpers';
 import {
   ResponsiveContainer,
   BarChart,
@@ -66,26 +68,12 @@ function AdminDashboard() {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 5);
 
-  // Dữ liệu biểu đồ doanh thu theo năm
-  const chartMap = {};
-  declarations.forEach(d => {
-    if (!chartMap[d.year]) {
-      chartMap[d.year] = { year: String(d.year), 'Thuế đã thu': 0, 'Số tờ khai': 0 };
-    }
-    chartMap[d.year]['Số tờ khai'] += 1;
-    if (d.status === 'paid') {
-      chartMap[d.year]['Thuế đã thu'] += d.taxAmount || 0;
-    }
-  });
-  const chartData = Object.values(chartMap).sort((a, b) => parseInt(a.year) - parseInt(b.year));
-
-  const statusMap = {
-    draft: { label: 'Nháp', cls: 'draft' },
-    pending: { label: 'Chờ nộp', cls: 'draft' },
-    submitted: { label: 'Đã gửi', cls: 'submitted' },
-    paid: { label: 'Đã nộp thuế', cls: 'paid' },
-    overdue: { label: 'Quá hạn', cls: 'overdue' },
-  };
+  const yearlyData = countDeclarationsByYear(declarations);
+  const chartData = yearlyData.map(d => ({
+    year: d.year,
+    'Thuế đã thu': d.paidRevenue,
+    'Số tờ khai': d.count,
+  }));
 
   return (
     <div className="page-container">
@@ -250,7 +238,7 @@ function AdminDashboard() {
                 </thead>
                 <tbody>
                   {recentDeclarations.map(d => {
-                    const st = statusMap[d.status] || { label: d.status, cls: '' };
+                    const st = getStatusConfig(d.status);
                     return (
                       <tr key={d._id}>
                         <td style={{ fontWeight: 650, color: 'var(--secondary)', fontFamily: 'monospace' }}>
@@ -259,7 +247,7 @@ function AdminDashboard() {
                         <td style={{ fontWeight: 500 }}>{d.user?.fullName || 'N/A'}</td>
                         <td>{d.declarationType === 'annual' ? `Năm ${d.year}` : `T${d.month}/${d.year}`}</td>
                         <td style={{ fontWeight: 600 }}>{formatCurrency(d.taxAmount)}</td>
-                        <td><span className={`status-badge ${st.cls}`}>{st.label}</span></td>
+                        <td><span className={`status-badge ${st.className}`}>{st.label}</span></td>
                       </tr>
                     );
                   })}
@@ -298,14 +286,6 @@ function UserDashboard() {
   const recentDeclarations = [...declarations]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 5);
-
-  const statusMap = {
-    draft: { label: 'Nháp', cls: 'draft' },
-    pending: { label: 'Chờ nộp', cls: 'draft' },
-    submitted: { label: 'Đã gửi', cls: 'submitted' },
-    paid: { label: 'Đã nộp thuế', cls: 'paid' },
-    overdue: { label: 'Quá hạn', cls: 'overdue' },
-  };
 
   return (
     <div className="page-container">
@@ -389,7 +369,7 @@ function UserDashboard() {
               </thead>
               <tbody>
                 {recentDeclarations.map(d => {
-                  const st = statusMap[d.status] || { label: d.status, cls: '' };
+                  const st = getStatusConfig(d.status);
                   return (
                     <tr key={d._id}>
                       <td style={{ fontWeight: 650, color: 'var(--secondary)', fontFamily: 'monospace' }}>
@@ -398,7 +378,7 @@ function UserDashboard() {
                       <td>{d.declarationType === 'annual' ? `Năm ${d.year}` : `Tháng ${d.month}/${d.year}`}</td>
                       <td>{formatCurrency(d.totalIncome)}</td>
                       <td style={{ fontWeight: 600 }}>{formatCurrency(d.taxAmount)}</td>
-                      <td><span className={`status-badge ${st.cls}`}>{st.label}</span></td>
+                      <td><span className={`status-badge ${st.className}`}>{st.label}</span></td>
                     </tr>
                   );
                 })}

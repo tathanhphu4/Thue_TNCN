@@ -1,24 +1,12 @@
 const TaxDeclaration = require('../models/TaxDeclaration');
 const { calculateTax, calculateTaxableIncome } = require('../utils/taxCalculator');
-const { PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../config/taxRules');
-
-const TaxConfig = require('../models/TaxConfig');
+const { loadTaxConfig } = require('../utils/taxConfigLoader');
 
 // POST /api/tax/calculate  (tính thuế không lưu)
 exports.calculate = async (req, res) => {
   try {
     const { totalIncome, dependents = 0, otherDeductions = 0, year = 2024 } = req.body;
-    
-    let personalDeduction = PERSONAL_DEDUCTION;
-    let dependentDeduction = DEPENDENT_DEDUCTION;
-    let taxBrackets = null;
-
-    const config = await TaxConfig.findOne({ year: parseInt(year), isActive: true });
-    if (config) {
-      personalDeduction = config.personalDeduction;
-      dependentDeduction = config.dependentDeduction;
-      taxBrackets = config.taxBrackets;
-    }
+    const { personalDeduction, dependentDeduction, taxBrackets } = await loadTaxConfig(year);
 
     const taxableIncome = calculateTaxableIncome({
       totalIncome, personalDeduction,
@@ -40,17 +28,7 @@ exports.declare = async (req, res) => {
     const totalIncome    = incomes.reduce((s, i) => s + i.amount, 0);
     const dependents     = deductions.find(d => d.type === 'dependent')?.dependents || 0;
     const otherDeductions = deductions.filter(d => d.type !== 'dependent').reduce((s, d) => s + d.amount, 0);
-
-    let personalDeduction = PERSONAL_DEDUCTION;
-    let dependentDeduction = DEPENDENT_DEDUCTION;
-    let taxBrackets = null;
-
-    const config = await TaxConfig.findOne({ year: parseInt(year), isActive: true });
-    if (config) {
-      personalDeduction = config.personalDeduction;
-      dependentDeduction = config.dependentDeduction;
-      taxBrackets = config.taxBrackets;
-    }
+    const { personalDeduction, dependentDeduction, taxBrackets } = await loadTaxConfig(year);
 
     const taxableIncome = calculateTaxableIncome({
       totalIncome, personalDeduction,

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { validateEmail, validatePassword } from '../utils/validators';
 import '../styles/auth.css';
 
 export default function LoginPage() {
@@ -21,16 +22,10 @@ export default function LoginPage() {
 
   const validate = () => {
     const errs = {};
-    if (!formData.email.trim()) {
-      errs.email = 'Vui lòng nhập địa chỉ email';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errs.email = 'Địa chỉ email không đúng định dạng';
-    }
-    if (!formData.password) {
-      errs.password = 'Vui lòng nhập mật khẩu';
-    } else if (formData.password.length < 6) {
-      errs.password = 'Mật khẩu phải có ít nhất 6 ký tự';
-    }
+    const emailErr = validateEmail(formData.email);
+    if (emailErr) errs.email = emailErr;
+    const passErr = validatePassword(formData.password);
+    if (passErr) errs.password = passErr;
     return errs;
   };
 

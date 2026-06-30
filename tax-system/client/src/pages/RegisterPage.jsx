@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import {
+  validateFullName, validateEmail, validatePassword,
+  validateConfirmPassword, validatePhoneRequired,
+  validateCCCD, validateTaxCode,
+} from '../utils/validators';
 import '../styles/auth.css';
 
 const initialForm = {
@@ -16,46 +21,26 @@ const initialForm = {
 const validate = (form) => {
   const errors = {};
 
-  if (!form.fullName.trim()) {
-    errors.fullName = 'Vui lòng nhập họ và tên';
-  } else if (form.fullName.trim().length < 2) {
-    errors.fullName = 'Họ tên phải có ít nhất 2 ký tự';
-  }
+  const nameErr = validateFullName(form.fullName);
+  if (nameErr) errors.fullName = nameErr;
 
-  if (!form.email.trim()) {
-    errors.email = 'Vui lòng nhập địa chỉ email';
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    errors.email = 'Địa chỉ email không hợp lệ';
-  }
+  const emailErr = validateEmail(form.email);
+  if (emailErr) errors.email = emailErr;
 
-  if (!form.password) {
-    errors.password = 'Vui lòng nhập mật khẩu';
-  } else if (form.password.length < 6) {
-    errors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
-  }
+  const passErr = validatePassword(form.password);
+  if (passErr) errors.password = passErr;
 
-  if (!form.confirmPassword) {
-    errors.confirmPassword = 'Vui lòng xác nhận mật khẩu';
-  } else if (form.password !== form.confirmPassword) {
-    errors.confirmPassword = 'Mật khẩu xác nhận không khớp';
-  }
+  const confirmErr = validateConfirmPassword(form.password, form.confirmPassword);
+  if (confirmErr) errors.confirmPassword = confirmErr;
 
-  if (!form.phone.trim()) {
-    errors.phone = 'Vui lòng nhập số điện thoại';
-  } else if (!/^(0[3|5|7|8|9])[0-9]{8}$/.test(form.phone.trim())) {
-    errors.phone = 'Số điện thoại không hợp lệ (VD: 0912345678)';
-  }
+  const phoneErr = validatePhoneRequired(form.phone);
+  if (phoneErr) errors.phone = phoneErr;
 
-  // CCCD bắt buộc
-  if (!form.idCard.trim()) {
-    errors.idCard = 'Vui lòng nhập số CCCD (bắt buộc)';
-  } else if (!/^\d{9}$|^\d{12}$/.test(form.idCard.trim())) {
-    errors.idCard = 'CCCD phải có 9 hoặc 12 chữ số';
-  }
+  const cccdErr = validateCCCD(form.idCard);
+  if (cccdErr) errors.idCard = cccdErr;
 
-  if (form.taxCode && !/^\d{10}$|^\d{13}$/.test(form.taxCode.trim())) {
-    errors.taxCode = 'Mã số thuế phải có 10 hoặc 13 chữ số';
-  }
+  const taxCodeErr = validateTaxCode(form.taxCode);
+  if (taxCodeErr) errors.taxCode = taxCodeErr;
 
   return errors;
 };
