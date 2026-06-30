@@ -37,11 +37,12 @@ const taxDeclarationSchema = new mongoose.Schema({
   // Trạng thái
   status: {
     type: String,
-    enum: ['draft', 'submitted', 'paid', 'overdue', 'cancelled'],
+    enum: ['draft', 'pending', 'submitted', 'paid', 'overdue', 'cancelled'],
     default: 'draft'
   },
   submittedAt:    { type: Date },
   paidAt:         { type: Date },
+  paymentMethod: { type: String },
   dueDate:        { type: Date },
   notes:          { type: String },
 }, { timestamps: true });

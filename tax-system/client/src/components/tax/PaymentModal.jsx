@@ -75,7 +75,7 @@ export default function PaymentModal({ declaration, onClose, onSuccess }) {
   };
 
   const taxAmount = declaration?.taxAmount || 0;
-  const year = declaration?.taxYear || "";
+  const year = declaration?.year || declaration?.taxYear || "";
   const declId = declaration?._id?.slice(-6).toUpperCase() || "";
 
   return (

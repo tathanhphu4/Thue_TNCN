@@ -12,7 +12,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     taxService.getDeclarations()
-      .then(d => setDeclarations(d.data || []))
+      .then(d => setDeclarations(d?.data || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);

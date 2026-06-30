@@ -107,7 +107,7 @@ const TaxDeclarePage = () => {
       await taxService.declare(payload);
       setSuccess(true);
     } catch (err) {
-      setServerError(err?.response?.data?.message || 'Gửi khai báo thất bại. Vui lòng thử lại.');
+      setServerError(err?.message || 'Gửi khai báo thất bại. Vui lòng thử lại.');
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ const TaxDeclarePage = () => {
             </div>
           </div>
           <div className="success-actions">
-            <button className="btn btn-primary" onClick={() => navigate('/tax-history')}>
+            <button className="btn btn-primary" onClick={() => navigate('/tax/history')}>
               📋 Xem lịch sử khai báo
             </button>
             <button className="btn btn-outline" onClick={() => { setSuccess(false); setStep(0); setIncomes([{ id: 1, source: 'salary', description: '', amount: '' }]); setDeductions([]); setPeriod({ year: currentYear, month: new Date().getMonth() + 1, declarationType: 'monthly' }); }}>

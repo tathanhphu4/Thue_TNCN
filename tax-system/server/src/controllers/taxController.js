@@ -39,7 +39,7 @@ exports.declare = async (req, res) => {
       user: req.user._id, year, month, declarationType,
       incomes, deductions, totalIncome, totalDeduction,
       taxableIncome, taxAmount: totalTax, taxBrackets: brackets,
-      status: 'submitted', submittedAt: new Date(),
+      status: 'pending', submittedAt: new Date(),
     });
 
     res.status(201).json({ success: true, data: declaration });
@@ -68,56 +68,39 @@ exports.getDeclaration = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-// Thêm vào cuối taxController.js
-
-export const payDeclaration = async (req, res) => {
+// POST /api/tax/declarations/:id/pay
+exports.payDeclaration = async (req, res) => {
   try {
-    const { id } = req.params;
     const { paymentMethod } = req.body;
 
     if (!paymentMethod) {
-      return res.status(400).json({ message: "Vui lòng chọn phương thức thanh toán." });
+      return res.status(400).json({ success: false, message: 'Vui lòng chọn phương thức thanh toán.' });
     }
 
     const declaration = await TaxDeclaration.findOne({
-      _id: id,
+      _id: req.params.id,
       user: req.user._id,
     });
 
     if (!declaration) {
-      return res.status(404).json({ message: "Không tìm thấy khai báo." });
+      return res.status(404).json({ success: false, message: 'Không tìm thấy khai báo.' });
     }
 
-    if (declaration.status === "paid") {
-      return res.status(400).json({ message: "Khai báo này đã được nộp thuế." });
+    if (declaration.status === 'paid') {
+      return res.status(400).json({ success: false, message: 'Khai báo này đã được nộp thuế.' });
     }
 
-    if (!["pending", "overdue"].includes(declaration.status)) {
-      return res.status(400).json({ message: "Khai báo không ở trạng thái có thể nộp thuế." });
+    if (!['pending', 'submitted', 'overdue'].includes(declaration.status)) {
+      return res.status(400).json({ success: false, message: 'Khai báo không ở trạng thái có thể nộp thuế.' });
     }
 
-    const payment = await Payment.create({
-      user: req.user._id,
-      declaration: declaration._id,
-      amount: declaration.taxAmount,
-      paymentMethod,
-      status: "completed",
-      paidAt: new Date(),
-    });
-
-    declaration.status = "paid";
+    declaration.status = 'paid';
     declaration.paidAt = new Date();
     declaration.paymentMethod = paymentMethod;
-    declaration.payment = payment._id;
     await declaration.save();
 
-    res.json({
-      message: "Nộp thuế thành công!",
-      declaration,
-      payment,
-    });
-  } catch (error) {
-    console.error("payDeclaration error:", error);
-    res.status(500).json({ message: "Lỗi server khi nộp thuế." });
+    res.json({ success: true, data: declaration });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
