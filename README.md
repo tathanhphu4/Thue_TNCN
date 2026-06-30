@@ -1,162 +1,163 @@
-# TaxVN - He Thong Tinh Thue Thu Nhap Ca Nhan
+# TaxVN — Hệ Thống Quản Lý Thuế Thu Nhập Cá Nhân
 
-He thong quan ly va tinh thue thu nhap ca nhan (TNCN) theo phap luat Viet Nam.
+Hệ thống khai báo và quản lý thuế thu nhập cá nhân (TNCN) trực tuyến theo pháp luật Việt Nam.
 
-## Cong nghe su dung
+Mã nguồn ứng dụng nằm trong thư mục [`tax-system/`](./tax-system).
 
-| Tang | Cong nghe |
+## Tính năng
+
+### Người dùng
+| Tính năng | Mô tả |
+|-----------|-------|
+| Đăng ký / Đăng nhập | Xác thực JWT, validate ở cả client và server |
+| Máy tính thuế | Tính thuế lũy tiến tức thì, hiển thị chi tiết từng bậc |
+| Khai báo thuế | Form động nhiều nguồn thu nhập và nhiều loại giảm trừ |
+| Nộp thuế | Modal 3 bước với 4 phương thức thanh toán |
+| Lịch sử khai báo | Lọc theo trạng thái/năm, xem chi tiết |
+| Báo cáo cá nhân | Biểu đồ Recharts (AreaChart + BarChart), tải PDF |
+| Hồ sơ cá nhân | Cập nhật thông tin và đổi mật khẩu |
+
+### Quản trị viên
+| Tính năng | Mô tả |
+|-----------|-------|
+| Quản lý người dùng | Danh sách, tìm kiếm, khóa/mở khóa tài khoản |
+| Quản lý tờ khai | Xem toàn bộ hệ thống, lọc theo trạng thái/năm |
+| Xuất Excel | Tải danh sách tờ khai dạng .xlsx |
+| Thống kê hệ thống | Tổng user, khai báo, doanh thu; biểu đồ theo năm |
+| Cấu hình biểu thuế | Chỉnh mức giảm trừ và bậc thuế suất theo năm |
+
+## Công nghệ
+
+| Tầng | Công nghệ |
 |------|-----------|
-| Frontend | React 18, JSX, React Router v6 |
-| Styling | CSS thuan (khong framework) |
+| Frontend | React 18 (JSX), React Router v6, Recharts |
+| Styling | Vanilla CSS (không framework) |
 | Backend | Node.js, Express.js |
 | Database | MongoDB, Mongoose |
-| Auth | JWT (JSON Web Token) |
+| Auth | JWT + bcryptjs |
+| Bảo mật | Helmet, CORS, express-rate-limit, express-validator |
 | Export | xlsx, pdfkit |
 
-## Cau truc du an
+## Cài đặt & Chạy local
 
-```
-tax-system/
-├── client/                  # React frontend
-│   ├── public/
-│   │   └── index.html
-│   └── src/
-│       ├── components/
-│       │   ├── auth/        # Login, Register forms
-│       │   ├── dashboard/   # Dashboard widgets
-│       │   ├── tax/         # Tax forms, calculator
-│       │   ├── reports/     # Charts, export
-│       │   ├── admin/       # Admin panels
-│       │   └── shared/      # Layout, PrivateRoute, common UI
-│       ├── pages/           # Page-level components
-│       ├── context/         # AuthContext
-│       ├── hooks/           # Custom hooks
-│       ├── services/        # API calls (axios)
-│       ├── utils/           # formatters, helpers
-│       └── styles/          # CSS files
-│
-├── server/                  # Express backend
-│   └── src/
-│       ├── config/          # DB, tax rules
-│       ├── controllers/     # Business logic
-│       ├── middleware/       # Auth, error handling
-│       ├── models/          # Mongoose schemas
-│       ├── routes/          # API routes
-│       └── utils/           # Tax calculator
-│
-├── docs/                    # Documentation
-│   ├── PROGRESS.md          # Tien do du an
-│   ├── API.md               # API documentation
-│   └── WORKFLOW.md          # Workflow & architecture
-│
-├── package.json             # Root scripts
-└── .gitignore
-```
-
-## Nhom chuc nang
-
-### Nhom 1: Nguoi dung
-- Dang ky / Dang nhap tai khoan
-- Cap nhat ho so ca nhan (ma so thue, CCCD)
-- **Tinh thue nhanh**: nhap thu nhap -> xem ket qua ngay
-- **Khai bao thue**: nhap day du thu nhap, giam tru, luu ho so
-- **Nop thue**: xac nhan va danh dau da nop
-- Xem lich su khai bao
-- Xuat PDF, in phieu thue
-
-### Nhom 2: Quan tri vien
-- Quan ly danh sach nguoi dung
-- Xem / duyet cac to khai thue
-- Bao cao tong hop: doanh thu thue, so nguoi nop
-- Cau hinh bieu thue, muc giam tru
-- Xuat bao cao Excel
-
-## Quy tac tinh thue TNCN
-
-Ap dung bieu thue luy tien tung phan (Luat Thue TNCN Viet Nam):
-
-| Bac | Thu nhap tinh thue/thang | Thue suat |
-|-----|--------------------------|-----------|
-| 1 | Den 5 trieu | 5% |
-| 2 | 5 - 10 trieu | 10% |
-| 3 | 10 - 18 trieu | 15% |
-| 4 | 18 - 32 trieu | 20% |
-| 5 | 32 - 52 trieu | 25% |
-| 6 | 52 - 80 trieu | 30% |
-| 7 | Tren 80 trieu | 35% |
-
-**Giam tru gia canh:**
-- Ban than: 11.000.000 VND/thang
-- Nguoi phu thuoc: 4.400.000 VND/nguoi/thang
-
-## Cai dat
-
-### Yeu cau he thong
+### Yêu cầu
 - Node.js >= 18.x
-- MongoDB >= 6.x
+- MongoDB >= 6.x (chạy local hoặc dùng MongoDB Atlas)
 - npm >= 9.x
 
-### Cai dat va chay
+### Các bước
 
 ```bash
-# 1. Clone du an
-git clone <repo-url>
-cd tax-system
+# 1. Clone project
+git clone https://github.com/tathanhphu4/Thue_TNCN.git
+cd Thue_TNCN/tax-system
 
-# 2. Cai dat dependencies
+# 2. Cài đặt tất cả dependencies
 npm run install:all
 
-# 3. Cau hinh bien moi truong
+# 3. Cấu hình backend
 cd server
 cp .env.example .env
-# Chinh sua .env voi thong tin cua ban
-
-# 4. Chay du an (ca frontend + backend)
+# Mở .env và chỉnh sửa MONGODB_URI, JWT_SECRET (chuỗi ngẫu nhiên >= 32 ký tự)
 cd ..
+
+# 4. Tạo dữ liệu mẫu (admin + user mẫu + biểu thuế)
+node server/src/utils/seed.js
+
+# 5. Chạy hệ thống (client + server)
 npm run dev
 ```
 
 **URLs:**
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-- API Health: http://localhost:5000/api/health
+- Backend API: http://localhost:5000/api
+- Health check: http://localhost:5000/api/health
 
-## API Endpoints
+### Tài khoản mẫu
 
-### Auth
-| Method | URL | Mo ta |
-|--------|-----|-------|
-| POST | /api/auth/register | Dang ky |
-| POST | /api/auth/login | Dang nhap |
-| GET | /api/auth/me | Thong tin ca nhan |
+| Role | Email | Mật khẩu |
+|------|-------|----------|
+| Admin | admin@taxvn.com | Admin@123 |
+| User | user@taxvn.com | User@123 |
 
-### Tax
-| Method | URL | Mo ta |
-|--------|-----|-------|
-| POST | /api/tax/calculate | Tinh thue (khong luu) |
-| POST | /api/tax/declare | Khai bao thue |
-| GET | /api/tax/declarations | Danh sach khai bao |
-| GET | /api/tax/declarations/:id | Chi tiet khai bao |
+## Lệnh tiện ích
 
-### Reports
-| Method | URL | Mo ta | Role |
-|--------|-----|-------|------|
-| GET | /api/reports/user | Bao cao ca nhan | user |
-| GET | /api/reports/summary | Tong quan he thong | admin |
+```bash
+npm run dev            # Chạy cả client + server (development)
+npm run server         # Chỉ chạy server
+npm run client         # Chỉ chạy client
+npm run install:all    # Cài tất cả packages
+node server/src/utils/seed.js   # Tạo dữ liệu mẫu
+cd client && npm run build      # Build production client
+```
 
-## Tien do
+## Deploy lên Production
 
-Xem file `docs/PROGRESS.md` de biet tinh trang cu the cua tung tinh nang.
+### Backend (Render / Railway)
+1. Kết nối GitHub repo với Render/Railway, chọn root là `tax-system/`.
+2. Environment Variables:
+   ```
+   NODE_ENV=production
+   PORT=5000
+   MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/tax_system
+   JWT_SECRET=<strong-random-secret>
+   ALLOWED_ORIGINS=https://your-frontend.vercel.app
+   ```
+3. Build command: `npm run install:all`
+4. Start command: `node server/src/index.js`
 
-## Dong gop
+### Frontend (Vercel / Netlify)
+1. Import repo, root directory: `tax-system/client`.
+2. Build command: `npm run build`, output dir: `build`.
+3. Environment Variable: `REACT_APP_API_URL=https://your-backend.onrender.com/api`
+4. Cấu hình SPA rewrites: `/* -> /index.html`
 
-1. Tao branch moi: `git checkout -b feature/ten-tinh-nang`
-2. Commit: `git commit -m "feat: mo ta ngan gon"`
-3. Push va tao Pull Request
+## Cấu trúc thư mục
 
-## Luu y phat trien
+```
+tax-system/
+├── client/                     # React frontend
+│   └── src/
+│       ├── components/          # Shared + tax components
+│       ├── context/             # AuthContext
+│       ├── pages/               # Các trang
+│       ├── services/            # Gọi API (axios)
+│       ├── styles/              # CSS
+│       └── utils/               # formatters
+│
+├── server/                     # Express backend
+│   └── src/
+│       ├── config/              # Kết nối DB, biểu thuế
+│       ├── controllers/         # Business logic
+│       ├── middleware/          # JWT auth, adminOnly
+│       ├── models/              # Mongoose schemas
+│       ├── routes/              # API routes
+│       └── utils/               # Tax calculator, seed
+│
+├── docs/                       # API.md, WORKFLOW.md
+├── Procfile
+└── package.json
+```
 
-- Tat ca tinh nang co duoi `.jsx` (React components)
-- Goi API tap trung qua `src/services/`
-- State quan ly qua React Context (khong dung Redux)
-- CSS viet rieng cho tung module, khong dung framework
+## Biểu thuế TNCN
+
+Biểu thuế lũy tiến từng phần (theo thu nhập tính thuế/tháng):
+
+| Bậc | Thu nhập tính thuế/tháng | Thuế suất |
+|-----|--------------------------|-----------|
+| 1 | Đến 5 triệu | 5% |
+| 2 | Trên 5 đến 10 triệu | 10% |
+| 3 | Trên 10 đến 18 triệu | 15% |
+| 4 | Trên 18 đến 32 triệu | 20% |
+| 5 | Trên 32 đến 52 triệu | 25% |
+| 6 | Trên 52 đến 80 triệu | 30% |
+| 7 | Trên 80 triệu | 35% |
+
+**Giảm trừ gia cảnh:** Bản thân 11.000.000 VNĐ/tháng | Người phụ thuộc 4.400.000 VNĐ/tháng/người
+
+> Biểu thuế và mức giảm trừ có thể cấu hình động theo từng năm qua Admin Panel.
+
+## Tài liệu
+
+- [API Documentation](./tax-system/docs/API.md)
+- [System Workflow](./tax-system/docs/WORKFLOW.md)
