@@ -4,49 +4,12 @@ import { taxService } from '../services/taxService';
 import IncomeForm from '../components/tax/IncomeForm';
 import DeductionForm from '../components/tax/DeductionForm';
 import TaxPreview from '../components/tax/TaxPreview';
+import { computeDeclarationTax } from '../utils/taxConstants';
 import '../styles/declare.css';
-
-const PERSONAL_DEDUCTION  = 11000000;
-const DEPENDENT_DEDUCTION =  4400000;
-const INSURANCE_RATE      = 0.105;
-const TAX_BRACKETS = [
-  { level: 1, min: 0,        max: 5000000,   rate: 0.05 },
-  { level: 2, min: 5000000,  max: 10000000,  rate: 0.10 },
-  { level: 3, min: 10000000, max: 18000000,  rate: 0.15 },
-  { level: 4, min: 18000000, max: 32000000,  rate: 0.20 },
-  { level: 5, min: 32000000, max: 52000000,  rate: 0.25 },
-  { level: 6, min: 52000000, max: 80000000,  rate: 0.30 },
-  { level: 7, min: 80000000, max: null,      rate: 0.35 },
-];
 
 const currentYear = new Date().getFullYear();
 const YEARS = [currentYear, currentYear - 1, currentYear - 2];
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-
-// Tính thuế client-side để preview
-const computeTax = (incomes, deductions) => {
-  const totalIncome = incomes.reduce((s, i) => s + (Number(i.amount) || 0), 0);
-  const dep = deductions.find(d => d.type === 'dependent');
-  const dependents = dep?.dependents || 0;
-  const insurance = Number(deductions.find(d => d.type === 'insurance')?.amount || 0);
-  const charity   = Number(deductions.find(d => d.type === 'charity')?.amount || 0);
-  const other     = Number(deductions.find(d => d.type === 'other')?.amount || 0);
-
-  const dependentDeduction = dependents * DEPENDENT_DEDUCTION;
-  const totalDeduction = PERSONAL_DEDUCTION + (insurance || Math.round(totalIncome * INSURANCE_RATE)) + dependentDeduction + charity + other;
-  const taxableIncome = Math.max(0, totalIncome - totalDeduction);
-
-  let taxAmount = 0;
-  for (const b of TAX_BRACKETS) {
-    if (taxableIncome <= b.min) break;
-    const upper = b.max ? Math.min(taxableIncome, b.max) : taxableIncome;
-    taxAmount += Math.round((upper - b.min) * b.rate);
-  }
-
-  const netIncome = totalIncome - (insurance || Math.round(totalIncome * INSURANCE_RATE)) - taxAmount;
-
-  return { totalIncome, personalDeduction: PERSONAL_DEDUCTION, dependentDeduction, totalDeduction, taxableIncome, taxAmount, netIncome };
-};
 
 const STEPS = ['Thông tin kỳ', 'Thu nhập', 'Giảm trừ', 'Xem trước'];
 
@@ -114,7 +77,7 @@ const TaxDeclarePage = () => {
   };
 
   // Tính preview data
-  const computed = computeTax(incomes, deductions);
+  const computed = computeDeclarationTax(incomes, deductions);
 
   // Màn hình thành công
   if (success) {

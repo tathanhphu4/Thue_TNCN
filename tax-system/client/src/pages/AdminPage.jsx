@@ -7,6 +7,9 @@ import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorMessage from '../components/shared/ErrorMessage';
 import EmptyState from '../components/shared/EmptyState';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { getStatusConfig } from '../utils/statusConfig';
+import { downloadAuthenticatedFile } from '../utils/fileDownload';
+import { useAlert } from '../hooks/useAlert';
 import {
   ResponsiveContainer,
   BarChart,
@@ -26,7 +29,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('users'); // 'users' | 'declarations' | 'reports' | 'config'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [alert, setAlert] = useState(null); // { type: 'success'|'error', message: '' }
+  const [alert, setAlert] = useAlert();
 
   // Data states
   const [users, setUsers] = useState([]);
@@ -88,14 +91,6 @@ export default function AdminPage() {
     loadData();
   }, [loadData]);
 
-  // Clear alert
-  useEffect(() => {
-    if (alert) {
-      const timer = setTimeout(() => setAlert(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [alert]);
-
   // Toggle user active status
   const handleToggleUserStatus = async (user) => {
     setActionLoadingId(user._id);
@@ -111,24 +106,10 @@ export default function AdminPage() {
     }
   };
 
-  // Export excel calling native API stream buffer download
   const handleExportExcel = async () => {
     setExportingExcel(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/reports/export/excel', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Không thể xuất file Excel.');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'danh_sach_khai_bao_thue_he_thong.xlsx';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      await downloadAuthenticatedFile('/api/reports/export/excel', 'danh_sach_khai_bao_thue_he_thong.xlsx');
       setAlert({ type: 'success', message: 'Xuất Excel thành công!' });
     } catch (err) {
       setAlert({ type: 'error', message: err.message });
@@ -400,14 +381,7 @@ export default function AdminPage() {
                     </thead>
                     <tbody>
                       {filteredDeclarations.map(d => {
-                        const statusMap = {
-                          draft: { label: 'Nháp', className: 'draft' },
-                          pending: { label: 'Chờ nộp', className: 'draft' },
-                          submitted: { label: 'Đã gửi', className: 'submitted' },
-                          paid: { label: 'Đã nộp thuế', className: 'paid' },
-                          overdue: { label: 'Quá hạn', className: 'overdue' },
-                        };
-                        const statusCfg = statusMap[d.status] || { label: d.status, className: '' };
+                        const statusCfg = getStatusConfig(d.status);
 
                         return (
                           <tr key={d._id}>
