@@ -4,10 +4,9 @@ import TaxBracketTable from '../components/tax/TaxBracketTable';
 import TaxResultCard from '../components/tax/TaxResultCard';
 import '../styles/calculator.css';
 
-// Tính thuế client-side (offline, không cần gọi API)
 const PERSONAL_DEDUCTION  = 11000000;
 const DEPENDENT_DEDUCTION =  4400000;
-const INSURANCE_RATE      = 0.105; // BHXH 8% + BHYT 1.5% + BHTN 1%
+const INSURANCE_RATE      = 0.105;
 
 const TAX_BRACKETS = [
   { level: 1, min: 0,        max: 5000000,   rate: 0.05 },
@@ -77,7 +76,6 @@ const TaxCalculatorPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Chỉ cho nhập số
     if (name !== 'dependents' && value && !/^\d*$/.test(value)) return;
     if (name === 'dependents' && value && !/^\d$/.test(value)) return;
     setForm(prev => ({ ...prev, [name]: value }));
@@ -100,7 +98,6 @@ const TaxCalculatorPage = () => {
 
     setLoading(true);
     try {
-      // Tính offline ngay lập tức
       const res = calculateTax({
         grossIncome:    Number(form.grossIncome),
         dependents:     Number(form.dependents) || 0,
@@ -108,12 +105,11 @@ const TaxCalculatorPage = () => {
       });
       setResult(res);
 
-      // Gọi API backend để lưu lịch sử (không block UI)
       taxService.calculate({
         grossIncome:    Number(form.grossIncome),
         dependents:     Number(form.dependents) || 0,
         otherDeduction: Number(form.otherDeduction) || 0,
-      }).catch(() => {}); // Bỏ qua lỗi API, vẫn hiển thị kết quả
+      }).catch(() => {});
 
     } finally {
       setLoading(false);

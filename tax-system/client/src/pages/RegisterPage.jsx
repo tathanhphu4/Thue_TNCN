@@ -9,8 +9,8 @@ const initialForm = {
   password: '',
   confirmPassword: '',
   phone: '',
-  idCard: '',   // Số CCCD - bắt buộc, không thể thay đổi sau khi đăng ký
-  taxCode: '',  // Mã số thuế - không bắt buộc
+  idCard: '',
+  taxCode: '',
 };
 
 const validate = (form) => {
@@ -46,7 +46,6 @@ const validate = (form) => {
     errors.phone = 'Số điện thoại không hợp lệ (VD: 0912345678)';
   }
 
-  // CCCD bắt buộc
   if (!form.idCard.trim()) {
     errors.idCard = 'Vui lòng nhập số CCCD (bắt buộc)';
   } else if (!/^\d{9}$|^\d{12}$/.test(form.idCard.trim())) {

@@ -68,20 +68,17 @@ export default function TaxHistoryPage() {
   };
 
   const handlePaymentSuccess = () => {
-    fetchDeclarations(); // reload list
+    fetchDeclarations();
   };
 
-  // Years available
   const years = [...new Set(declarations.map((d) => d.year))].sort((a, b) => b - a);
 
-  // Filter
   const filtered = declarations.filter((d) => {
     const matchStatus = filterStatus === "all" || d.status === filterStatus;
     const matchYear = filterYear === "all" || String(d.year) === filterYear;
     return matchStatus && matchYear;
   });
 
-  // Stats
   const totalTax = declarations
     .filter((d) => d.status === "paid")
     .reduce((sum, d) => sum + (d.taxAmount || 0), 0);

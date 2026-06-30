@@ -23,7 +23,6 @@ const currentYear = new Date().getFullYear();
 const YEARS = [currentYear, currentYear - 1, currentYear - 2];
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
-// Tính thuế client-side để preview
 const computeTax = (incomes, deductions) => {
   const totalIncome = incomes.reduce((s, i) => s + (Number(i.amount) || 0), 0);
   const dep = deductions.find(d => d.type === 'dependent');
@@ -57,7 +56,6 @@ const TaxDeclarePage = () => {
   const [serverError, setServerError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // Form state
   const [period, setPeriod] = useState({
     year: currentYear,
     month: new Date().getMonth() + 1,
@@ -69,7 +67,6 @@ const TaxDeclarePage = () => {
   const [deductions, setDeductions] = useState([]);
   const [errors, setErrors] = useState({});
 
-  // Validate từng step
   const validateStep = (s) => {
     const errs = {};
     if (s === 0) {
@@ -113,10 +110,8 @@ const TaxDeclarePage = () => {
     }
   };
 
-  // Tính preview data
   const computed = computeTax(incomes, deductions);
 
-  // Màn hình thành công
   if (success) {
     return (
       <div className="declare-page">

@@ -11,9 +11,8 @@ export default function ProfilePage() {
   const { user, updateUser } = useAuth();
   const [stats, setStats] = useState({ total: 0, paid: 0, totalTax: 0 });
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("info"); // 'info' | 'password'
+  const [activeTab, setActiveTab] = useState("info");
 
-  // Forms state
   const [profileForm, setProfileForm] = useState({
     fullName: "",
     phone: "",
@@ -27,17 +26,15 @@ export default function ProfilePage() {
     confirmPassword: "",
   });
 
-  // Action states
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
-  const [alert, setAlert] = useState(null); // { type: 'success'|'error', message: '' }
+  const [alert, setAlert] = useState(null);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch full profile info
         const userRes = await authService.getMe();
         const fullUser = userRes.user || userRes.data || userRes;
         if (fullUser) {
@@ -50,7 +47,6 @@ export default function ProfilePage() {
           });
         }
 
-        // Fetch stats
         const taxRes = await taxService.getDeclarations();
         const declarations = taxRes?.data || taxRes || [];
         const paid = declarations.filter((d) => d.status === "paid");
@@ -69,7 +65,6 @@ export default function ProfilePage() {
     fetchData();
   }, []);
 
-  // Clear alert after 5s
   useEffect(() => {
     if (alert) {
       const timer = setTimeout(() => setAlert(null), 5000);
@@ -98,7 +93,6 @@ export default function ProfilePage() {
     setErrors({});
     setAlert(null);
 
-    // Validation
     const newErrors = {};
     if (!profileForm.fullName.trim()) {
       newErrors.fullName = "Vui lòng nhập họ và tên";
@@ -116,7 +110,6 @@ export default function ProfilePage() {
     try {
       const res = await userService.updateProfile(profileForm);
       const updatedUser = res.data || res;
-      // Merge properties because backend select('-password') might not return all role fields, but we should make sure
       const mergedUser = { ...user, ...updatedUser };
       updateUser(mergedUser);
       setAlert({ type: "success", message: "Cập nhật hồ sơ thành công!" });
@@ -135,7 +128,6 @@ export default function ProfilePage() {
     setErrors({});
     setAlert(null);
 
-    // Validation
     const newErrors = {};
     if (!passwordForm.currentPassword) {
       newErrors.currentPassword = "Vui lòng nhập mật khẩu hiện tại";

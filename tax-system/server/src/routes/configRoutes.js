@@ -3,7 +3,6 @@ const { protect, adminOnly } = require('../middleware/auth');
 const TaxConfig = require('../models/TaxConfig');
 const { TAX_BRACKETS, PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../config/taxRules');
 
-// GET /api/config/tax-rules
 router.get('/tax-rules', protect, async (req, res) => {
   try {
     const year = parseInt(req.query.year) || 2024;
@@ -35,7 +34,6 @@ router.get('/tax-rules', protect, async (req, res) => {
   }
 });
 
-// PUT /api/config/tax-rules
 router.put('/tax-rules', protect, adminOnly, async (req, res) => {
   try {
     const { year = 2024, TAX_BRACKETS: inputBrackets, PERSONAL_DEDUCTION: personal, DEPENDENT_DEDUCTION: dependent } = req.body;

@@ -5,7 +5,6 @@ const User = require('../models/User');
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
 
-// ── Validator middleware chains (export để dùng trong routes) ──────────────
 exports.validateRegister = [
   body('fullName')
     .trim()
@@ -26,7 +25,6 @@ exports.validateRegister = [
     .optional({ checkFalsy: true })
     .matches(/^(0[3|5|7|8|9])[0-9]{8}$/).withMessage('Số điện thoại không hợp lệ'),
 
-  // CCCD là BẮT BUỘC khi đăng ký và không thể thay đổi sau đó
   body('idCard')
     .trim()
     .notEmpty().withMessage('Vui lòng nhập số CCCD')
@@ -42,7 +40,6 @@ exports.validateLogin = [
   body('password').notEmpty().withMessage('Vui lòng nhập mật khẩu'),
 ];
 
-// ── Helper: đọc lỗi validator và trả về 400 ───────────────────────────────
 const checkValidation = (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -53,17 +50,14 @@ const checkValidation = (req, res) => {
   return true;
 };
 
-// POST /api/auth/register
 exports.register = async (req, res) => {
   if (!checkValidation(req, res)) return;
   try {
     const { fullName, email, password, phone, idCard, taxCode } = req.body;
 
-    // Kiểm tra email đã tồn tại
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ success: false, message: 'Email này đã được đăng ký. Vui lòng dùng email khác.' });
 
-    // Kiểm tra CCCD đã tồn tại
     const existingCCCD = await User.findOne({ idNumber: idCard });
     if (existingCCCD) return res.status(400).json({ success: false, message: 'Số CCCD này đã được đăng ký trong hệ thống.' });
 
@@ -94,7 +88,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// POST /api/auth/login
 exports.login = async (req, res) => {
   if (!checkValidation(req, res)) return;
   try {
@@ -125,7 +118,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// GET /api/auth/me
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).select('-password');

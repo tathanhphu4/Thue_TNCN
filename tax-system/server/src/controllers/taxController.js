@@ -4,7 +4,6 @@ const { PERSONAL_DEDUCTION, DEPENDENT_DEDUCTION } = require('../config/taxRules'
 
 const TaxConfig = require('../models/TaxConfig');
 
-// POST /api/tax/calculate  (tính thuế không lưu)
 exports.calculate = async (req, res) => {
   try {
     const { totalIncome, dependents = 0, otherDeductions = 0, year = 2024 } = req.body;
@@ -32,7 +31,6 @@ exports.calculate = async (req, res) => {
 };
 
 
-// POST /api/tax/declare  (lưu khai báo)
 exports.declare = async (req, res) => {
   try {
     const { year, month, declarationType, incomes, deductions } = req.body;
@@ -73,7 +71,6 @@ exports.declare = async (req, res) => {
   }
 };
 
-// GET /api/tax/declarations
 exports.getDeclarations = async (req, res) => {
   try {
     const declarations = await TaxDeclaration.find({ user: req.user._id }).sort({ createdAt: -1 });
@@ -83,7 +80,6 @@ exports.getDeclarations = async (req, res) => {
   }
 };
 
-// GET /api/tax/declarations/:id
 exports.getDeclaration = async (req, res) => {
   try {
     const declaration = await TaxDeclaration.findOne({ _id: req.params.id, user: req.user._id });
@@ -93,7 +89,6 @@ exports.getDeclaration = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
-// POST /api/tax/declarations/:id/pay
 exports.payDeclaration = async (req, res) => {
   try {
     const { paymentMethod } = req.body;
@@ -130,7 +125,6 @@ exports.payDeclaration = async (req, res) => {
   }
 };
 
-// GET /api/tax/admin/declarations (admin: lấy tất cả tờ khai)
 exports.getAllDeclarations = async (req, res) => {
   try {
     const declarations = await TaxDeclaration.find().populate('user').sort({ createdAt: -1 });

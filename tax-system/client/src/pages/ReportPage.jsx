@@ -69,10 +69,8 @@ export default function ReportPage() {
 
   if (loading) return <LoadingSpinner message="Đang tải dữ liệu báo cáo..." />;
 
-  // 1. Years list
   const years = [...new Set(declarations.map(d => d.year))].sort((a, b) => b - a);
 
-  // 2. Aggregate data for Charts
   const chartDataMap = {};
   declarations.forEach(d => {
     if (!chartDataMap[d.year]) {
@@ -87,13 +85,11 @@ export default function ReportPage() {
 
   const chartData = Object.values(chartDataMap).sort((a, b) => parseInt(a.year) - parseInt(b.year));
 
-  // 3. Stats summary
   const totalIncome = declarations.reduce((sum, d) => sum + (d.totalIncome || 0), 0);
   const totalTaxPayable = declarations.reduce((sum, d) => sum + (d.taxAmount || 0), 0);
   const totalTaxPaid = declarations.filter(d => d.status === 'paid').reduce((sum, d) => sum + (d.taxAmount || 0), 0);
   const pendingTax = declarations.filter(d => d.status === 'pending' || d.status === 'overdue').reduce((sum, d) => sum + (d.taxAmount || 0), 0);
 
-  // 4. Filter declarations for Table
   const filteredDeclarations = declarations.filter(d => {
     return selectedYear === 'all' || String(d.year) === selectedYear;
   });

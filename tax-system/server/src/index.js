@@ -8,10 +8,8 @@ require('dotenv').config();
 
 const app = express();
 
-// ── Bảo mật cơ bản ────────────────────────────────────────────────────────
 app.use(helmet());
 
-// CORS: cho phép origin từ env hoặc localhost khi development
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
   : [
@@ -23,10 +21,8 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Cho phép curl / Postman / server-to-server (không có origin)
     if (!origin) return callback(null, true);
     
-    // Chuẩn hóa origin (bỏ dấu gạch chéo cuối nếu có)
     const normalizedOrigin = origin.replace(/\/$/, '');
     const isAllowed = allowedOrigins.some(o => o.replace(/\/$/, '') === normalizedOrigin);
     
@@ -39,10 +35,9 @@ app.use(cors({
   credentials: true,
 }));
 
-// Rate limiting - chỉ áp dụng cho auth routes
 const authLimiter = rateLimit({
-  windowMs: 60 * 1000,         // 1 phút
-  max: 10,                      // tối đa 10 lần / phút / IP
+  windowMs: 60 * 1000,
+  max: 10,
   message: {
     success: false,
     message: 'Quá nhiều yêu cầu xác thực. Vui lòng thử lại sau 1 phút.',
@@ -51,27 +46,21 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// ── Logging & Parsing ──────────────────────────────────────────────────────
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ── Routes ─────────────────────────────────────────────────────────────────
 app.use('/api/auth',    authLimiter, require('./routes/authRoutes'));
 app.use('/api/users',   require('./routes/userRoutes'));
 app.use('/api/tax',     require('./routes/taxRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/config',  require('./routes/configRoutes'));
 
-// Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Tax System API is running' });
 });
 
-// ── Global Error Handler ───────────────────────────────────────────────────
-// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  // CORS error
   if (err.message && err.message.startsWith('CORS:')) {
     return res.status(403).json({ success: false, message: err.message });
   }
@@ -79,7 +68,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Lỗi server nội bộ. Vui lòng thử lại.' });
 });
 
-// ── Connect MongoDB & Start ────────────────────────────────────────────────
 const PORT       = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/tax_system';
 

@@ -6,8 +6,8 @@ const userSchema = new mongoose.Schema({
   email:        { type: String, required: true, unique: true, lowercase: true },
   password:     { type: String, required: true },
   phone:        { type: String },
-  taxCode:      { type: String, unique: true, sparse: true }, // Mã số thuế
-  idNumber:     { type: String, unique: true, sparse: true }, // CCCD/CMND - không thể thay đổi sau khi đăng ký
+  taxCode:      { type: String, unique: true, sparse: true },
+  idNumber:     { type: String, unique: true, sparse: true },
   dateOfBirth:  { type: Date },
   address:      { type: String },
   role:         { type: String, enum: ['user', 'admin'], default: 'user' },

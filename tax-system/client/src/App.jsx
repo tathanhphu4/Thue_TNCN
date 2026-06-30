@@ -5,7 +5,6 @@ import PrivateRoute   from './components/shared/PrivateRoute';
 import AdminRoute     from './components/shared/AdminRoute';
 import ErrorBoundary  from './components/shared/ErrorBoundary';
 
-// Pages
 import LoginPage    from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';

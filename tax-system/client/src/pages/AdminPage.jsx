@@ -23,17 +23,15 @@ import '../styles/admin.css';
 
 export default function AdminPage() {
   const { user: currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('users'); // 'users' | 'declarations' | 'reports' | 'config'
+  const [activeTab, setActiveTab] = useState('users');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [alert, setAlert] = useState(null); // { type: 'success'|'error', message: '' }
+  const [alert, setAlert] = useState(null);
 
-  // Data states
   const [users, setUsers] = useState([]);
   const [declarations, setDeclarations] = useState([]);
   const [summary, setSummary] = useState({ totalUsers: 0, totalDeclarations: 0, totalTaxCollected: 0 });
   
-  // Tax configuration state
   const [configYear, setConfigYear] = useState(2025);
   const [taxConfig, setTaxConfig] = useState({
     personalDeduction: 11000000,
@@ -41,17 +39,14 @@ export default function AdminPage() {
     taxBrackets: []
   });
 
-  // Filter & Search states
   const [userSearch, setUserSearch] = useState('');
   const [declStatusFilter, setDeclStatusFilter] = useState('all');
   const [declYearFilter, setDeclYearFilter] = useState('all');
 
-  // Loading actions
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [savingConfig, setSavingConfig] = useState(false);
   const [exportingExcel, setExportingExcel] = useState(false);
 
-  // Load all initial data for the active tab or systems
   const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -88,7 +83,6 @@ export default function AdminPage() {
     loadData();
   }, [loadData]);
 
-  // Clear alert
   useEffect(() => {
     if (alert) {
       const timer = setTimeout(() => setAlert(null), 5000);
@@ -96,7 +90,6 @@ export default function AdminPage() {
     }
   }, [alert]);
 
-  // Toggle user active status
   const handleToggleUserStatus = async (user) => {
     setActionLoadingId(user._id);
     setAlert(null);
@@ -111,7 +104,6 @@ export default function AdminPage() {
     }
   };
 
-  // Export excel calling native API stream buffer download
   const handleExportExcel = async () => {
     setExportingExcel(true);
     try {
@@ -137,7 +129,6 @@ export default function AdminPage() {
     }
   };
 
-  // Config bracket handlers
   const handleConfigChange = (e) => {
     const { name, value } = e.target;
     setTaxConfig(prev => ({ ...prev, [name]: parseInt(value) || 0 }));
@@ -181,7 +172,6 @@ export default function AdminPage() {
     }
   };
 
-  // Filter users by search input
   const filteredUsers = users.filter(u => {
     const query = userSearch.toLowerCase();
     return u.fullName.toLowerCase().includes(query) ||
@@ -190,7 +180,6 @@ export default function AdminPage() {
            (u.idNumber && u.idNumber.includes(query));
   });
 
-  // Filter declarations by Status & Year
   const filteredDeclarations = declarations.filter(d => {
     const matchStatus = declStatusFilter === 'all' || d.status === declStatusFilter;
     const matchYear = declYearFilter === 'all' || String(d.year) === declYearFilter;
@@ -199,7 +188,6 @@ export default function AdminPage() {
 
   const availableYears = [...new Set(declarations.map(d => d.year))].sort((a, b) => b - a);
 
-  // Group report data for System Summary Chart
   const systemChartDataMap = {};
   declarations.forEach(d => {
     if (!systemChartDataMap[d.year]) {

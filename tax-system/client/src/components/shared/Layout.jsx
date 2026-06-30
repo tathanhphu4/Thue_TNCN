@@ -24,7 +24,6 @@ export default function Layout({ children }) {
   const handleLogout = () => { logout(); navigate('/login'); };
   const filtered = navItems.filter(i => i.roles.includes(user?.role));
 
-  // Đóng sidebar khi click ra ngoài (mobile)
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (sidebarOpen && sidebarRef.current && !sidebarRef.current.contains(e.target)) {
@@ -35,7 +34,6 @@ export default function Layout({ children }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [sidebarOpen]);
 
-  // Khoá scroll body khi sidebar mở trên mobile
   useEffect(() => {
     if (sidebarOpen) {
       document.body.style.overflow = 'hidden';
@@ -45,7 +43,6 @@ export default function Layout({ children }) {
     return () => { document.body.style.overflow = ''; };
   }, [sidebarOpen]);
 
-  // Đóng sidebar khi chuyển trang
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);

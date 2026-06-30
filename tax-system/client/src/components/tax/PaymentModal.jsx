@@ -21,7 +21,7 @@ const formatCurrency = (amount) =>
 
 export default function PaymentModal({ declaration, onClose, onSuccess }) {
   const [selectedMethod, setSelectedMethod] = useState("");
-  const [step, setStep] = useState(1); // 1: chon phuong thuc, 2: xac nhan, 3: thanh cong
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [qrLoaded, setQrLoaded] = useState(true);

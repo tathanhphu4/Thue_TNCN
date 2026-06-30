@@ -1,6 +1,5 @@
 const User = require('../models/User');
 
-// GET /api/users (admin)
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find({ role: 'user' }).select('-password');
@@ -10,10 +9,8 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// PUT /api/users/profile
 exports.updateProfile = async (req, res) => {
   try {
-    // Chỉ cho phép cập nhật các trường an toàn, KHÔNG bao gồm idNumber và taxCode
     const { fullName, phone, address, dateOfBirth } = req.body;
     const user = await User.findByIdAndUpdate(
       req.user._id,
@@ -26,7 +23,6 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// PUT /api/users/change-password
 exports.changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -57,7 +53,6 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-// PUT /api/users/:id/toggle-status (admin: khóa/mở khóa tài khoản)
 exports.toggleUserStatus = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

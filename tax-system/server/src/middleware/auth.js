@@ -10,7 +10,6 @@ exports.protect = async (req, res, next) => {
     req.user = await User.findById(decoded.id).select('-password');
     if (!req.user) return res.status(401).json({ success: false, message: 'Token không hợp lệ' });
 
-    // Kiểm tra tài khoản bị khóa
     if (req.user.isActive === false) {
       return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.' });
     }

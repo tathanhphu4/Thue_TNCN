@@ -12,7 +12,6 @@ const seed = async () => {
   await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tax_system');
   console.log('Đã kết nối MongoDB');
 
-  // Tạo tài khoản quản trị viên
   const existingAdmin = await User.findOne({ email: 'admin@taxvn.com' });
   if (!existingAdmin) {
     await User.create({
@@ -24,7 +23,6 @@ const seed = async () => {
     console.log('Đã tạo admin: admin@taxvn.com / Admin@123');
   }
 
-  // Tạo tài khoản người dùng mẫu
   const existingUser = await User.findOne({ email: 'user@taxvn.com' });
   if (!existingUser) {
     await User.create({
@@ -39,7 +37,6 @@ const seed = async () => {
     console.log('Đã tạo user: user@taxvn.com / User@123');
   }
 
-  // Tạo cấu hình thuế 2024, 2025, 2026
   const yearsToSeed = [2024, 2025, 2026];
   for (const yr of yearsToSeed) {
     const existingConfig = await TaxConfig.findOne({ year: yr });

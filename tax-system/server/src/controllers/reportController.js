@@ -1,7 +1,6 @@
 const TaxDeclaration = require('../models/TaxDeclaration');
 const User = require('../models/User');
 
-// GET /api/reports/summary  (admin: tổng quan hệ thống)
 exports.getSystemSummary = async (req, res) => {
   try {
     const totalUsers  = await User.countDocuments({ role: 'user' });
@@ -24,7 +23,6 @@ exports.getSystemSummary = async (req, res) => {
   }
 };
 
-// GET /api/reports/user  (user: báo cáo cá nhân)
 exports.getUserReport = async (req, res) => {
   try {
     const { year } = req.query;
@@ -40,7 +38,6 @@ exports.getUserReport = async (req, res) => {
   }
 };
 
-// GET /api/reports/export/pdf/:id  (user: xuất PDF phiếu thuế)
 exports.exportPDF = async (req, res) => {
   try {
     const fs = require('fs');
@@ -62,7 +59,6 @@ exports.exportPDF = async (req, res) => {
     
     doc.pipe(res);
 
-    // Font selection for Vietnamese support
     if (fs.existsSync('C:/Windows/Fonts/arial.ttf')) {
       doc.font('C:/Windows/Fonts/arial.ttf');
     }
@@ -71,14 +67,12 @@ exports.exportPDF = async (req, res) => {
     const secondaryColor = '#2c3e50';
     const accentColor = '#27ae60';
 
-    // Header Title
     doc.fillColor(primaryColor).fontSize(16).text('CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM', { align: 'center' });
     doc.fontSize(11).text('Độc lập - Tự do - Hạnh phúc', { align: 'center' });
     doc.moveDown(1);
     doc.fontSize(15).text('CHỨNG NHẬN KHAI BÁO & NỘP THUẾ THU NHẬP CÁ NHÂN', { align: 'center', underline: true });
     doc.moveDown(1.5);
 
-    // Declaration Meta
     doc.fillColor(secondaryColor).fontSize(11);
     doc.text(`Mã tờ khai: #${declaration._id.toString().toUpperCase()}`);
     doc.text(`Kỳ tính thuế: ${declaration.declarationType === 'annual' ? `Năm ${declaration.year}` : `Tháng ${declaration.month}/${declaration.year}`}`);
@@ -86,11 +80,9 @@ exports.exportPDF = async (req, res) => {
     doc.text(`Trạng thái: ${declaration.status === 'paid' ? 'ĐÃ NỘP THUẾ' : 'CHƯA NỘP THUẾ'}`);
     doc.moveDown(1);
 
-    // Divider line
     doc.strokeColor(primaryColor).lineWidth(1.5).moveTo(50, doc.y).lineTo(550, doc.y).stroke();
     doc.moveDown(1);
 
-    // Section 1: User Info
     doc.fillColor(primaryColor).fontSize(13).text('I. THÔNG TIN NGƯỜI NỘP THUẾ');
     doc.moveDown(0.5);
     doc.fillColor(secondaryColor).fontSize(11);
@@ -103,7 +95,6 @@ exports.exportPDF = async (req, res) => {
     doc.text(`Số điện thoại: ${user.phone || 'Chưa cập nhật'}`);
     doc.moveDown(1);
 
-    // Section 2: Income Details
     doc.fillColor(primaryColor).fontSize(13).text('II. CHI TIẾT THU NHẬP');
     doc.moveDown(0.5);
     doc.fillColor(secondaryColor).fontSize(11);
@@ -120,7 +111,6 @@ exports.exportPDF = async (req, res) => {
     doc.text(`-> Tổng thu nhập chịu thuế trước giảm trừ: ${declaration.totalIncome.toLocaleString('vi-VN')} VND`);
     doc.moveDown(1);
 
-    // Section 3: Deductions
     doc.fillColor(primaryColor).fontSize(13).text('III. CÁC KHOẢN GIẢM TRỪ');
     doc.moveDown(0.5);
     doc.fillColor(secondaryColor).fontSize(11);
@@ -144,7 +134,6 @@ exports.exportPDF = async (req, res) => {
     doc.text(`-> Tổng các khoản giảm trừ gia cảnh: ${declaration.totalDeduction.toLocaleString('vi-VN')} VND`);
     doc.moveDown(1);
 
-    // Section 4: Tax Calculation Result
     doc.fillColor(primaryColor).fontSize(13).text('IV. KẾT QUẢ TÍNH THUẾ & NỘP THUẾ');
     doc.moveDown(0.5);
     doc.fillColor(secondaryColor).fontSize(11);
@@ -163,7 +152,6 @@ exports.exportPDF = async (req, res) => {
     }
     doc.moveDown(2);
 
-    // Footer signature
     doc.fillColor(secondaryColor).fontSize(10);
     const dateNow = new Date();
     doc.text(`Ngày lập chứng nhận: ngày ${dateNow.getDate()} tháng ${dateNow.getMonth() + 1} năm ${dateNow.getFullYear()}`, { align: 'right' });
@@ -177,7 +165,6 @@ exports.exportPDF = async (req, res) => {
   }
 };
 
-// GET /api/reports/export/excel  (admin: xuất Excel tất cả tờ khai)
 exports.exportExcel = async (req, res) => {
   try {
     const XLSX = require('xlsx');
@@ -224,7 +211,6 @@ exports.exportExcel = async (req, res) => {
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'DanhSachKhaiBao');
 
-    // Auto-fit widths
     const maxLens = {};
     formattedData.forEach((row) => {
       Object.keys(row).forEach((key) => {
