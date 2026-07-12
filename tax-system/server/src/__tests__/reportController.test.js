@@ -1,5 +1,5 @@
 /**
- * Unit Test cho controllers/reportController.js
+ * Unit Test cho báo cáo admin
  * Nhóm 10 – TaxVN
  */
 

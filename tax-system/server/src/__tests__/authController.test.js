@@ -1,5 +1,5 @@
 /**
- * Unit Test cho controllers/authController.js
+ * Unit Test cho đăng nhập đăng kí
  * Nhóm 10 – TaxVN
  */
 

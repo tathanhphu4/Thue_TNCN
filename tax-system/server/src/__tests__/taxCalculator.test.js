@@ -1,5 +1,5 @@
 /**
- * Unit Test cho taxCalculator.js
+ * Unit Test cho tính thuế thu nhập cá nhân
  * Nhóm 10 – TaxVN
  */
 
