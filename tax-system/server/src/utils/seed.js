@@ -225,7 +225,6 @@ const seed = async () => {
     });
     createdDeclarations++;
 
-    // Tạo Payment nếu tờ khai đã 'paid'
     if (status === 'paid') {
       await Payment.create({
         user: user._id,
