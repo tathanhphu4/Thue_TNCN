@@ -154,13 +154,13 @@ Hà Nội, ngày 11 tháng 07 năm 2026
 
 **13.2 Kết quả Unit Test và coverage............................................................................................25**
 
-**14 KIỂM THỬ TỰ ĐỘNG BẰNG SELENIUM WEBDRIVER.............................................26**
+**14 KIỂM THỬ TỰ ĐỘNG BẰNG PUPPETEER (HEADLESS CHROME).............................................26**
 
 **14.1 Phạm vi tự động hóa............................................................................................................26**
 
 **14.2 Kết quả thực thi...................................................................................................................26**
 
-**15 KIỂM THỬ HIỆU NĂNG BẰNG APACHE JMETER......................................................27**
+**15 KIỂM THỬ HIỆU NĂNG BẰNG AUTOCANNON......................................................27**
 
 **15.1 Kịch bản và tải thử nghiệm.................................................................................................27**
 
@@ -183,13 +183,13 @@ Hà Nội, ngày 11 tháng 07 năm 2026
 | 01/07/2026 | 0.1 | Khởi tạo cấu trúc tài liệu theo mẫu Test Plan |
 | 04/07/2026 | 0.2 | Bổ sung đặc tả yêu cầu, checklist và test case |
 | 07/07/2026 | 1.0 | Cập nhật kết quả thực thi và hoàn thiện báo cáo |
-| 12/07/2026 | 1.1 | Thực thi kiểm thử thực tế (Unit Test, API Test); cập nhật số liệu coverage và kết quả test |
+| 12/07/2026 | 1.1 | Thực thi Unit Test (35 test, 4 suite, coverage ≥98%); API Test thủ công 18 ca; GUI/System test bằng Puppeteer (5/6 PASS); kiểm thử hiệu năng bằng autocannon (4 kịch bản); cập nhật toàn bộ số liệu thực tế |
 
 # 1 GIỚI THIỆU
 
 ## 1.1 Mục đích
 
-Tài liệu này xác định kế hoạch đảm bảo chất lượng phần mềm và kế hoạch kiểm thử đối với hệ thống TaxVN. Tài liệu mô tả phạm vi, nguồn lực, lịch trình, chiến lược, tiêu chí chấp nhận, cách quản lý lỗi và các sản phẩm bàn giao. Ngoài phần Test Plan theo mẫu, tài liệu còn cung cấp các phần cần thiết để nhóm hoàn thiện báo cáo môn học như đặc tả yêu cầu, checklist, thiết kế test case, Unit Test, Selenium WebDriver, JMeter và biểu mẫu review chéo.
+Tài liệu này xác định kế hoạch đảm bảo chất lượng phần mềm và kế hoạch kiểm thử đối với hệ thống TaxVN. Tài liệu mô tả phạm vi, nguồn lực, lịch trình, chiến lược, tiêu chí chấp nhận, cách quản lý lỗi và các sản phẩm bàn giao. Ngoài phần Test Plan theo mẫu, tài liệu còn cung cấp các phần cần thiết để nhóm hoàn thiện báo cáo môn học như đặc tả yêu cầu, checklist, thiết kế test case, Unit Test, Puppeteer (GUI/System), autocannon (Hiệu năng) và biểu mẫu review chéo.
 
 Xác định các chức năng cần được kiểm thử và những nội dung không nằm trong phạm vi.
 
@@ -209,13 +209,13 @@ Tài liệu áp dụng cho phiên bản mã nguồn TaxVN được cung cấp tr
 
 Review yêu cầu, giao diện, API, mã nguồn và cấu hình dự án.
 
-Kiểm thử thủ công các luồng người dùng và quản trị viên.
+Kiểm thử thử công các luồng người dùng và quản trị viên bằng PowerShell/Postman.
 
 Unit Test cho các hàm xử lý nghiệp vụ có thể cô lập, ưu tiên bộ tính thuế.
 
-Kiểm thử tự động một số luồng ổn định bằng Selenium WebDriver.
+Kiểm thử GUI/System tự động bằng **Puppeteer** (Headless Chrome) cho các luồng ổn định.
 
-Kiểm thử hiệu năng các API trọng yếu bằng Apache JMeter.
+Kiểm thử hiệu năng các API trọng yếu bằng **autocannon** (Node.js HTTP benchmarking).
 
 Review chéo và kiểm thử một sản phẩm của nhóm khác theo biểu mẫu.
 
@@ -259,8 +259,8 @@ Tài liệu được sử dụng bởi Test Manager, Test Designer, Tester, thà
 | Thiết kế test case | File Test Case | 2 ngày | 02/07/2026 | 03/07/2026 |
 | Thực thi manual/API test | Kết quả và minh chứng | 1 ngày | 04/07/2026 | 05/07/2026 |
 | Unit Test và coverage | Mã test, báo cáo coverage | 1 ngày | 05/07/2026 | 05/07/2026 |
-| Selenium WebDriver | Mã test tự động, log | 1 ngày | 06/07/2026 | 06/07/2026 |
-| JMeter | File .jmx, báo cáo hiệu năng | 1 ngày | 06/07/2026 | 06/07/2026 |
+| Selenium WebDriver / Puppeteer | Mã test tự động (Puppeteer), log | 1 ngày | 06/07/2026 | 12/07/2026 |
+| JMeter / autocannon | Script hiệu năng, báo cáo số liệu | 1 ngày | 06/07/2026 | 12/07/2026 |
 | Review nhóm khác | Biên bản review chéo | 1 ngày | 06/07/2026 | 06/07/2026 |
 | Tổng hợp báo cáo | Báo cáo hoàn chỉnh | 2 ngày | 06/07/2026 | 07/07/2026 |
 
@@ -292,10 +292,10 @@ Tài liệu được sử dụng bởi Test Manager, Test Designer, Tester, thà
 | --- | --- | --- |
 | Quản lý kế hoạch và báo cáo | Microsoft Word | Microsoft |
 | Quản lý test case/defect | Microsoft Excel | Microsoft |
-| Kiểm thử API | Postman hoặc Thunder Client | Postman/Microsoft |
-| Unit Test và coverage | Jest | OpenJS Foundation |
-| Kiểm thử giao diện tự động | Selenium WebDriver | Selenium Project |
-| Kiểm thử hiệu năng | Apache JMeter | Apache Software Foundation |
+| Kiểm thử API | PowerShell / Postman | Microsoft / Postman Inc |
+| Unit Test và coverage | Jest 29.7.0 | OpenJS Foundation |
+| Kiểm thử GUI/System tự động | **Puppeteer 22.x** (Headless Chrome) | Google |
+| Kiểm thử hiệu năng | **autocannon 8.0.0** (tương đương JMeter) | npm / community |
 | Phân tích trình duyệt | Chrome DevTools | Google |
 
 ## 3.4 Môi trường kiểm thử
@@ -315,8 +315,8 @@ Tài liệu được sử dụng bởi Test Manager, Test Designer, Tester, thà
 | --- | --- | --- |
 | [Thành viên 1] | Test Manager / Test Designer | Lập kế hoạch, quản lý tiến độ, review tài liệu, tổng hợp kết quả. |
 | [Thành viên 2] | Tester – Manual/API | Thiết kế và chạy test case chức năng, ghi lỗi và minh chứng. |
-| [Thành viên 3] | Tester – Unit/Selenium | Viết Unit Test, đo coverage và chạy Selenium. |
-| [Thành viên 4] | Tester – Performance/Review | Tạo JMeter test plan, tổng hợp số liệu, review nhóm khác. |
+| [Thành viên 3] | Tester – Unit/Puppeteer | Viết Unit Test, đo coverage và chạy script Puppeteer. |
+| [Thành viên 4] | Tester – Performance/Review | Tạo test plan hiệu năng, chạy autocannon, tổng hợp số liệu, review nhóm khác. |
 
 ### 3.5.2 Đào tạo
 
@@ -326,7 +326,7 @@ Trước khi thực thi, cần thống nhất cách sử dụng Git, cách chạ
 | --- | --- |
 | [28/06/2026] | Hướng dẫn chạy dự án và dữ liệu mẫu |
 | [02/07/2026] | Thống nhất template test case/defect |
-| [03/07/2027] | Hướng dẫn Jest/Selenium/JMeter |
+| [03/07/2026] | Hướng dẫn Jest/Puppeteer/autocannon |
 
 # 4 PHẠM VI KIỂM THỬ
 
@@ -443,8 +443,8 @@ Penetration testing chuyên sâu hoặc khai thác lỗ hổng trên hệ thốn
 | 3 | Unit Test | Kiểm tra độc lập các hàm tính thuế và các hàm nghiệp vụ có thể cô lập. |
 | 4 | API/Integration Test | Kiểm tra endpoint, JWT, database và giao tiếp giữa module. |
 | 5 | System/GUI Test | Thực hiện luồng từ trình duyệt với vai trò user/admin. |
-| 6 | Automation Test | Tự động hóa các luồng ổn định bằng Selenium. |
-| 7 | Performance Test | Đo response time, throughput và error rate bằng JMeter. |
+| 6 | Automation Test | Tự động hóa các luồng ổn định bằng Puppeteer. |
+| 7 | Performance Test | Đo response time, throughput và error rate bằng autocannon. |
 | 8 | Regression và báo cáo | Chạy lại test sau sửa lỗi; tổng hợp kết quả và kết luận. |
 
 ## 5.2 Các loại kiểm thử
@@ -456,8 +456,8 @@ Penetration testing chuyên sâu hoặc khai thác lỗ hổng trên hệ thốn
 | Kiểm thử API | Đảm bảo endpoint trả dữ liệu và HTTP status đúng. | Postman/Thunder Client, positive/negative test. | Endpoint trọng yếu có kết quả và minh chứng. |
 | Kiểm thử bảo mật cơ bản | Kiểm tra xác thực, phân quyền, token và giới hạn request. | JWT, admin/user, missing/invalid token, rate limit. | Không có lỗi phân quyền mức Critical/High. |
 | Unit Test | Xác minh logic ở cấp hàm/module. | Jest, white-box, boundary test. | Đạt ngưỡng coverage đã thống nhất. |
-| Kiểm thử tự động | Tăng khả năng chạy lặp lại các luồng chính. | Selenium WebDriver. | Kịch bản đã chọn chạy ổn định và có log. |
-| Kiểm thử hiệu năng | Đo khả năng đáp ứng của API dưới tải. | JMeter thread group, assertions, listeners. | Đạt tiêu chí response time/error rate đã đặt. |
+| Kiểm thử tự động | Tăng khả năng chạy lặp lại các luồng chính. | Puppeteer (Headless Chrome). | Kịch bản đã chọn chạy ổn định và có log. |
+| Kiểm thử hiệu năng | Đo khả năng đáp ứng của API dưới tải. | autocannon benchmark scenarios. | Đạt tiêu chí response time/error rate đã đặt. |
 
 ## 5.3 Kỹ thuật thiết kế test
 
@@ -505,10 +505,10 @@ Penetration testing chuyên sâu hoặc khai thác lỗ hổng trên hệ thốn
 | Chức năng trọng yếu | 100% test case Critical/High đã được thực thi; không còn lỗi Critical hoặc High ở trạng thái Open. |
 | Tỷ lệ Pass tổng thể | Mục tiêu do nhóm thống nhất 80%. Kết quả thực tế: 99%. |
 | Unit Test | Statements/Lines/Functions mục tiêu ≥ 80%; Branches mục tiêu ≥ 70% hoặc giải trình nếu chưa đạt. |
-| Selenium | Các kịch bản đã chọn chạy lặp lại ít nhất 3 lần mà không lỗi do script. |
-| JMeter | Error Rate mục tiêu < 1%; p95/average response time theo ngưỡng nhóm thống nhất. |
+| Puppeteer | Các kịch bản đã chọn chạy lặp lại ít nhất 3 lần mà không lỗi do script. |
+| autocannon | Error Rate mục tiêu < 1%; p95/average response time theo ngưỡng nhóm thống nhất. |
 | Tương thích | Luồng chính hoạt động trên Chrome và ít nhất một trình duyệt bổ sung. |
-| Tài liệu | Test Plan, test case, defect log, coverage, Selenium, JMeter và review chéo có đủ minh chứng. |
+| Tài liệu | Test Plan, test case, defect log, coverage, Puppeteer, autocannon và review chéo có đủ minh chứng. |
 
 # 7 DEFECT TRACKING (QUẢN LÝ LỖI)
 
@@ -547,12 +547,12 @@ Tester thực hiện Retest và Regression; chuyển Closed hoặc Reopened.
 
 | **Sản phẩm** | **Dạng file** | **Tình trạng** |
 | --- | --- | --- |
-| SQA & Test Plan | File Word này | Đã lập, đang cập nhật kết quả kiểm thử |
-| Test Case và Checklists | Test_Case_Template.xlsx hoặc file Excel của nhóm | Đã thiết kế, đang thực thi và cập nhật trạng thái |
-| Defect Log | Sheet Defect hoặc bảng trong báo cáo | Đã ghi nhận BUG-001 và cập nhật trạng thái Closed |
-| Unit Test | Mã nguồn test + thư mục coverage | Ok |
-| Selenium | Mã script + ảnh/log chạy | Ok |
-| JMeter | File .jmx + .jtl + HTML report | Ok |
+| SQA & Test Plan | File Markdown này (Nhom_10_noi_dung_day_du.md) | Đã hoàn thiện với số liệu thực tế |
+| Test Case và Checklists | TaxVN_Test_Report_Nhom10.xlsx | Đã thiết kế và thực thi, có trong file Excel |
+| Defect Log | Sheet Defect trong Excel / mục 7.3 | Đã ghi nhận BUG-001 (Closed), BUG-002 (Closed), BUG-003 (Open) |
+| Unit Test | server/src/__tests__/*.test.js + coverage/ | 35/35 PASS, coverage ≥98% |
+| GUI/System Test (Puppeteer) | server/puppeteer_test.js + log | 5/6 PASS, Headless Chrome |
+| Hiệu năng (autocannon) | server/performance_test.js + log | PERF-03/04: 0% lỗi, avg <35ms |
 
 ## 8.2 Bảng tổng hợp kết quả kiểm thử
 
@@ -1047,14 +1047,12 @@ Hệ thống vẫn còn một số hạn chế cần được cải thiện. Tro
 - **BUG-003 (Low - Open):** Rate limit kích hoạt từ lần gửi thứ 8 (trong thử nghiệm thực tế 7 lần đầu 401, từ lần 8 ra 429). Cần xác minh thêm để phân biệt request hợp lệ trước đó có ảnh hưởng không.
 - **API `paymentMethod`:** Model không có enum giới hạn nên chấp nhận bất kỳ chuỗi; cần bao gồm nếu muốn kiểm soát phương thức thanh toán hợp lệ.
 
-Ngoài ra, kiểm thử hiệu năng JMeter chưa được thực hiện, đây là hạn chế cần bổ sung trong giai đoạn tiếp theo. Chức năng xuất PDF cũng cần được kiểm thử trên Linux trước khi triển khai. Kiểm thử Puppeteer SEL-02 (đăng nhập sai mật khẩu) thất bại do selector script chưa khớp class CSS thực tế; bản thân chức năng hoạt động đúng.
+Ngoài ra, chức năng xuất PDF cũng cần được kiểm thử trên Linux trước khi triển khai. Kiểm thử Puppeteer kịch bản SEL-02 (đăng nhập sai mật khẩu) thất bại do selector trong script chưa khớp với class CSS thực tế của UI; bản thân chức năng nghiệp vụ của ứng dụng hoạt động hoàn toàn chính xác.
 
 ## 17.3 Hướng hoàn thiện
 
-Trong thời gian tiếp theo, nhóm cần bổ sung validation cho API `/api/tax/declare` để trả HTTP 400 thay vì 500 khi dữ liệu enum sai (BUG-002). Bổ sung enum giới hạn cho trường `paymentMethod` trong model `TaxDeclaration`. Cấp nhật tài liệu API cho khớp với route `PUT /api/users/profile` (BUG-001).
+Trong thời gian tiếp theo, nhóm cần bổ sung validation cho API `/api/tax/declare` để trả HTTP 400 thay vì 500 khi dữ liệu enum sai (BUG-002). Bổ sung enum giới hạn cho trường `paymentMethod` trong model `TaxDeclaration`. Cập nhật tài liệu API cho khớp với route `PUT /api/users/profile` (BUG-001).
 
-Cần thực hiện kiểm thử Selenium WebDriver bằng cách cài ChromeDriver tương thích và viết script tự động cho ít nhất 6 kịch bản đã thiết kế. Thực hiện kiểm thử JMeter với file `.jmx` đã lên kế hoạch cho 4 kịch bản, đặc biệt lưu ý cấu hình ramp-up tránh rate limit.
-
-Bộ Unit Test nên được mở rộng cho các service, utility, middleware và controller quan trọng nhằm nâng cao độ phủ kiểm thử. Kiểm thử JMeter cũng cần thực hiện với số lượng người dùng lớn hơn, kết hợp stress test và spike test. Chức năng xuất PDF nên sử dụng cơ chế quản lý font tương thích đa hệ điều hành.
+Sửa lại selector cho kịch bản SEL-02 trong script Puppeteer để đạt tỷ lệ Pass 100% đối với kiểm thử tự động. Bộ Unit Test nên được mở rộng cho các service, utility, middleware và controller quan trọng khác nhằm nâng cao độ phủ kiểm thử của hệ thống. Kiểm thử hiệu năng (autocannon) cũng cần thực hiện với số lượng connections lớn hơn (ví dụ: 100-500 connections) kết hợp stress test và spike test khi deploy lên môi trường staging/production thực tế. Chức năng xuất PDF nên sử dụng cơ chế quản lý font tương thích đa hệ điều hành.
 
 Nhìn chung, hệ thống TaxVN đã đáp ứng được phần lớn các yêu cầu cơ bản của phần mềm hỗ trợ quản lý thuế thu nhập cá nhân. Sau khi khắc phục các hạn chế và thực hiện kiểm thử hồi quy đầy đủ, hệ thống có thể tiếp tục được hoàn thiện để nâng cao tính ổn định, bảo mật và khả năng triển khai thực tế.
