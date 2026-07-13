@@ -211,45 +211,42 @@ actor User as Người dùng
 participant Client as Client (React)
 participant Server as Server (Express)
 participant DB as Database (MongoDB)
-note right of User: LUỒNG ĐĂNG KÝ
-User->>Client: Nhập Họ tên, Email, Mật khẩu, CCCD, MST, SĐT
-Client->>Client: Validate đầu vào (Format email, CCCD, mật khẩu...)
-Client->>Server: POST /api/auth/register
-Server->>Server: express-validator kiểm tra cấu trúc dữ liệu
-Server->>DB: Tìm kiếm theo Email hoặc CCCD
-DB-->>Server: Trả về thông tin (nếu đã tồn tại)
-alt Email hoặc CCCD đã tồn tại
-Server-->>Client: Trả về lỗi 400 (Email/CCCD đã đăng ký)
-Client-->>User: Hiển thị thông báo lỗi
-else Dữ liệu hợp lệ & Chưa tồn tại
-Server->>Server: bcrypt hash mật khẩu (rounds = 12)
-Server->>DB: Tạo bản ghi User mới
-DB-->>Server: Lưu User thành công
-Server->>Server: Tạo JWT token (signToken)
-Server-->>Client: Trả về 201 Created kèm JWT Token & User Info
-Client->>Client: Lưu token vào localStorage & cập nhật AuthContext
-Client-->>User: Điều hướng về Dashboard
+Note over User,DB: Luồng đăng ký
+User->>Client: Nhập thông tin đăng ký
+Client->>Client: Validate đầu vào
+Client->>Server: POST /auth/register
+Server->>DB: Kiểm tra Email/CCCD tồn tại
+DB-->>Server: Kết quả kiểm tra
+alt Đã tồn tại
+    Server-->>Client: 400 Email/CCCD đã dùng
+    Client-->>User: Báo lỗi
+else Hợp lệ
+    Server->>Server: Hash mật khẩu (bcrypt)
+    Server->>DB: Tạo User mới
+    DB-->>Server: Lưu thành công
+    Server->>Server: Tạo JWT token
+    Server-->>Client: 201 Created + token
+    Client->>Client: Lưu token, cập nhật AuthContext
+    Client-->>User: Vào Dashboard
 end
-end
-note right of User: LUỒNG ĐĂNG NHẬP
-User->>Client: Nhập Email và Mật khẩu
-Client->>Server: POST /api/auth/login (email, password)
-Server->>Server: Kiểm tra rate-limit (tối đa 10 req/phút/IP)
+
+Note over User,DB: Luồng đăng nhập
+User->>Client: Nhập Email, mật khẩu
+Client->>Server: POST /auth/login
+Server->>Server: Kiểm tra rate-limit
 Server->>DB: Tìm User theo Email
-DB-->>Server: Trả về thông tin User
-alt User không tồn tại hoặc mật khẩu không khớp
-Server-->>Client: Trả về lỗi 401 (Email hoặc mật khẩu không đúng)
-Client-->>User: Hiển thị thông báo lỗi
-else User bị khóa (isActive = false)
-Server-->>Client: Trả về lỗi 403 (Tài khoản bị khóa)
-Client-->>User: Thông báo liên hệ quản trị viên
-else Xác thực thành công
-Server->>Server: bcrypt.compare so sánh mật khẩu
-Server->>Server: Tạo JWT token
-Server-->>Client: Trả về 200 OK kèm JWT Token & User Info
-Client->>Client: Lưu token vào localStorage & cập nhật AuthContext
-Client-->>User: Điều hướng về Dashboard
-end
+DB-->>Server: Thông tin User
+alt Sai thông tin
+    Server-->>Client: 401 Sai email/mật khẩu
+    Client-->>User: Báo lỗi
+else Tài khoản bị khóa
+    Server-->>Client: 403 Tài khoản bị khóa
+    Client-->>User: Báo liên hệ admin
+else Thành công
+    Server->>Server: So sánh mật khẩu, tạo JWT
+    Server-->>Client: 200 OK + token
+    Client->>Client: Lưu token, cập nhật AuthContext
+    Client-->>User: Vào Dashboard
 end
 
 ```
