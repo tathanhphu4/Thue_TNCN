@@ -143,27 +143,61 @@ graph TD
 ### Chi tiết tệp tin
 ```
 tax-system/
-├── client/                     # React frontend
+├── package.json            # Root: concurrently chạy cả 2 service
+├── client/                 # Frontend (React 18)
+│   ├── package.json
+│   ├── public/
 │   └── src/
-│       ├── components/          # Shared + tax components
-│       ├── context/             # AuthContext (Quản lý trạng thái đăng nhập)
-│       ├── pages/               # Các trang giao diện (Dashboard, Declare, Calculator...)
-│       ├── services/            # Gọi API (sử dụng axios)
-│       ├── styles/              # Các tệp CSS cho giao diện
-│       └── utils/               # Hàm định dạng tiền, ngày tháng
+│       ├── App.jsx         # Router + route definitions
+│       ├── index.jsx       # Entry point
+│       ├── context/
+│       │   └── AuthContext.jsx  # Global auth state (JWT)
+│       ├── components/
+│       │   └── shared/     # PrivateRoute, AdminRoute, ErrorBoundary
+│       ├── pages/
+│       │   ├── LoginPage.jsx
+│       │   ├── RegisterPage.jsx
+│       │   ├── DashboardPage.jsx
+│       │   ├── TaxCalculatorPage.jsx
+│       │   ├── TaxDeclarePage.jsx
+│       │   ├── TaxHistoryPage.jsx
+│       │   ├── ProfilePage.jsx
+│       │   ├── ReportPage.jsx
+│       │   └── AdminPage.jsx
+│       ├── services/       # API calls (axios)
+│       ├── hooks/          # Custom React hooks
+│       ├── styles/         # CSS modules
+│       └── utils/          # Helpers
 │
-└── server/                     # Express backend
+└── server/                 # Backend (Node.js + Express)
+    ├── package.json
+    ├── .env
     └── src/
-        ├── config/              # Cấu hình biểu thuế, kết nối DB
-        ├── controllers/         # Xử lý nghiệp vụ (auth, tax, report, user)
-        ├── middleware/          # JWT authentication, phân quyền admin
-        ├── models/              # Định nghĩa Mongoose schemas (User, Declaration...)
-        ├── routes/              # Định tuyến API routes
-        └── utils/               # Công cụ tính toán thuế, seed dữ liệu mẫu
-│
-├── docs/                       # Tài liệu thiết kế API và hệ thống
-├── Procfile
-└── package.json
+        ├── index.js        # Entry point + middleware + routes
+        ├── config/
+        │   └── taxRules.js # Biểu thuế TNCN Việt Nam
+        ├── controllers/
+        │   ├── authController.js
+        │   ├── taxController.js
+        │   ├── reportController.js
+        │   └── userController.js
+        ├── middleware/
+        │   └── auth.js     # JWT verify, adminOnly guard
+        ├── models/
+        │   ├── User.js
+        │   ├── TaxDeclaration.js
+        │   ├── Payment.js
+        │   └── TaxConfig.js
+        ├── routes/
+        │   ├── authRoutes.js
+        │   ├── taxRoutes.js
+        │   ├── reportRoutes.js
+        │   ├── userRoutes.js
+        │   └── configRoutes.js
+        └── utils/
+            ├── taxCalculator.js  # Logic tính thuế lũy tiến
+            └── seed.js           # Seed data mẫu
+
 ```
 
 ## Sơ đồ luồng hoạt động
