@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCurrency } from "../../utils/formatters";
 import "../../styles/paymentModal.css";
 
 const PAYMENT_METHODS = [
@@ -15,9 +16,6 @@ const PAYMENT_METHODS = [
     desc: "Quét mã QR để chuyển khoản nhanh",
   },
 ];
-
-const formatCurrency = (amount) =>
-  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(amount);
 
 export default function PaymentModal({ declaration, onClose, onSuccess }) {
   const [selectedMethod, setSelectedMethod] = useState("");

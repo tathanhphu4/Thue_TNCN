@@ -4,6 +4,8 @@ import { taxService } from '../services/taxService';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import ErrorMessage from '../components/shared/ErrorMessage';
 import { formatCurrency, formatDate } from '../utils/formatters';
+import { getStatusConfig } from '../utils/statusConfig';
+import { downloadAuthenticatedFile } from '../utils/fileDownload';
 import {
   ResponsiveContainer,
   BarChart,
@@ -46,20 +48,10 @@ export default function ReportPage() {
   const downloadPDF = async (declId) => {
     setDownloadingId(declId);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/reports/export/pdf/${declId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Không thể xuất file PDF.');
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `chung_nhan_thue_${declId.slice(-6).toUpperCase()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      await downloadAuthenticatedFile(
+        `/api/reports/export/pdf/${declId}`,
+        `chung_nhan_thue_${declId.slice(-6).toUpperCase()}.pdf`
+      );
     } catch (err) {
       alert(err.message);
     } finally {
@@ -221,14 +213,7 @@ export default function ReportPage() {
               </thead>
               <tbody>
                 {filteredDeclarations.map(decl => {
-                  const statusMap = {
-                    draft: { label: 'Nháp', className: 'draft' },
-                    pending: { label: 'Chờ nộp', className: 'draft' },
-                    submitted: { label: 'Đã gửi', className: 'submitted' },
-                    paid: { label: 'Đã nộp thuế', className: 'paid' },
-                    overdue: { label: 'Quá hạn', className: 'overdue' },
-                  };
-                  const statusCfg = statusMap[decl.status] || { label: decl.status, className: '' };
+                  const statusCfg = getStatusConfig(decl.status);
 
                   return (
                     <tr key={decl._id}>

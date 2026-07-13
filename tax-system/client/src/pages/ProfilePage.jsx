@@ -4,6 +4,8 @@ import { taxService } from "../services/taxService";
 import { authService } from "../services/authService";
 import { userService } from "../services/userService";
 import { formatCurrency, formatDate } from "../utils/formatters";
+import { validatePhone } from "../utils/validators";
+import { useAlert } from "../hooks/useAlert";
 import LoadingSpinner from "../components/shared/LoadingSpinner";
 import "../styles/profile.css";
 
@@ -30,7 +32,7 @@ export default function ProfilePage() {
   // Action states
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
-  const [alert, setAlert] = useState(null); // { type: 'success'|'error', message: '' }
+  const [alert, setAlert] = useAlert();
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -69,14 +71,6 @@ export default function ProfilePage() {
     fetchData();
   }, []);
 
-  // Clear alert after 5s
-  useEffect(() => {
-    if (alert) {
-      const timer = setTimeout(() => setAlert(null), 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [alert]);
-
   const handleProfileChange = (e) => {
     const { name, value } = e.target;
     setProfileForm((prev) => ({ ...prev, [name]: value }));
@@ -103,9 +97,8 @@ export default function ProfilePage() {
     if (!profileForm.fullName.trim()) {
       newErrors.fullName = "Vui lòng nhập họ và tên";
     }
-    if (profileForm.phone && !/^(0[3|5|7|8|9])[0-9]{8}$/.test(profileForm.phone.trim())) {
-      newErrors.phone = "Số điện thoại không hợp lệ (VD: 0912345678)";
-    }
+    const phoneErr = validatePhone(profileForm.phone);
+    if (phoneErr) newErrors.phone = phoneErr;
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
