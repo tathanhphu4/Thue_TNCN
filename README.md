@@ -211,7 +211,6 @@ actor User as Người dùng
 participant Client as Client (React)
 participant Server as Server (Express)
 participant DB as Database (MongoDB)
-rect rgb(240, 248, 255)
 note right of User: LUỒNG ĐĂNG KÝ
 User->>Client: Nhập Họ tên, Email, Mật khẩu, CCCD, MST, SĐT
 Client->>Client: Validate đầu vào (Format email, CCCD, mật khẩu...)
@@ -232,7 +231,6 @@ Client->>Client: Lưu token vào localStorage & cập nhật AuthContext
 Client-->>User: Điều hướng về Dashboard
 end
 end
-rect rgb(245, 255, 250)
 note right of User: LUỒNG ĐĂNG NHẬP
 User->>Client: Nhập Email và Mật khẩu
 Client->>Server: POST /api/auth/login (email, password)
