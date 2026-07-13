@@ -114,29 +114,145 @@ cd client && npm run build      # Build production client
 
 ## Cấu trúc thư mục
 
+### Sơ đồ cấu trúc thư mục
+
+```mermaid
+graph TD
+    Root[tax-system/] --> Client[client/]
+    Root --> Server[server/]
+    Root --> Docs[docs/]
+
+    Client --> C_Src[src/]
+    C_Src --> C_App[App.jsx <br/> Định nghĩa routes]
+    C_Src --> C_Comp[components/ <br/> Shared & Tax Components]
+    C_Src --> C_Cont[context/ <br/> AuthContext.jsx]
+    C_Src --> C_Pages[pages/ <br/> LoginPage.jsx, AdminPage.jsx...]
+    C_Src --> C_Serv[services/ <br/> API Services]
+    C_Src --> C_Styles[styles/ <br/> CSS Styles]
+
+    Server --> S_Src[src/]
+    S_Src --> S_Index[index.js <br/> Entrypoint & Middleware]
+    S_Src --> S_Config[config/ <br/> Kết nối DB, biểu thuế]
+    S_Src --> S_Controllers[controllers/ <br/> auth, tax, report, user]
+    S_Src --> S_Middleware[middleware/ <br/> JWT Auth, Admin Guards]
+    S_Src --> S_Models[models/ <br/> User, TaxDeclaration, Payment, TaxConfig]
+    S_Src --> S_Routes[routes/ <br/> authRoutes, taxRoutes...]
+    S_Src --> S_Utils[utils/ <br/> taxCalculator.js, seed.js]
+```
+
+### Chi tiết tệp tin
 ```
 tax-system/
 ├── client/                     # React frontend
 │   └── src/
 │       ├── components/          # Shared + tax components
-│       ├── context/             # AuthContext
-│       ├── pages/               # Các trang
-│       ├── services/            # Gọi API (axios)
-│       ├── styles/              # CSS
-│       └── utils/               # formatters
+│       ├── context/             # AuthContext (Quản lý trạng thái đăng nhập)
+│       ├── pages/               # Các trang giao diện (Dashboard, Declare, Calculator...)
+│       ├── services/            # Gọi API (sử dụng axios)
+│       ├── styles/              # Các tệp CSS cho giao diện
+│       └── utils/               # Hàm định dạng tiền, ngày tháng
 │
-├── server/                     # Express backend
-│   └── src/
-│       ├── config/              # Kết nối DB, biểu thuế
-│       ├── controllers/         # Business logic
-│       ├── middleware/          # JWT auth, adminOnly
-│       ├── models/              # Mongoose schemas
-│       ├── routes/              # API routes
-│       └── utils/               # Tax calculator, seed
+└── server/                     # Express backend
+    └── src/
+        ├── config/              # Cấu hình biểu thuế, kết nối DB
+        ├── controllers/         # Xử lý nghiệp vụ (auth, tax, report, user)
+        ├── middleware/          # JWT authentication, phân quyền admin
+        ├── models/              # Định nghĩa Mongoose schemas (User, Declaration...)
+        ├── routes/              # Định tuyến API routes
+        └── utils/               # Công cụ tính toán thuế, seed dữ liệu mẫu
 │
-├── docs/                       # API.md, WORKFLOW.md
+├── docs/                       # Tài liệu thiết kế API và hệ thống
 ├── Procfile
 └── package.json
+```
+
+## Sơ đồ luồng hoạt động
+
+### 1. Luồng Đăng nhập & Đăng ký
+
+```mermaid
+sequenceDiagram
+    actor User as Người dùng
+    participant Client as Client (React)
+    participant Server as Server (Express)
+    participant DB as Database (MongoDB)
+
+    rect rgb(240, 248, 255)
+        note right of User: LUỒNG ĐĂNG KÝ
+        User->>Client: Nhập Họ tên, Email, Mật khẩu, CCCD, MST, SĐT
+        Client->>Client: Validate đầu vào (Format email, CCCD, mật khẩu...)
+        Client->>Server: POST /api/auth/register
+        Server->>Server: express-validator kiểm tra cấu trúc dữ liệu
+        Server->>DB: Tìm kiếm theo Email hoặc CCCD
+        DB-->>Server: Trả về thông tin (nếu đã tồn tại)
+        alt Email hoặc CCCD đã tồn tại
+            Server-->>Client: Trả về lỗi 400 (Email/CCCD đã đăng ký)
+            Client-->>User: Hiển thị thông báo lỗi
+        else Dữ liệu hợp lệ & Chưa tồn tại
+            Server->>Server: bcrypt hash mật khẩu (rounds = 12)
+            Server->>DB: Tạo bản ghi User mới
+            DB-->>Server: Lưu User thành công
+            Server->>Server: Tạo JWT token (signToken)
+            Server-->>Client: Trả về 201 Created kèm JWT Token & User Info
+            Client->>Client: Lưu token vào localStorage & cập nhật AuthContext
+            Client-->>User: Điều hướng về Dashboard
+        end
+    end
+
+    rect rgb(245, 255, 250)
+        note right of User: LUỒNG ĐĂNG NHẬP
+        User->>Client: Nhập Email và Mật khẩu
+        Client->>Server: POST /api/auth/login (email, password)
+        Server->>Server: Kiểm tra rate-limit (tối đa 10 req/phút/IP)
+        Server->>DB: Tìm User theo Email
+        DB-->>Server: Trả về thông tin User
+        alt User không tồn tại hoặc mật khẩu không khớp
+            Server-->>Client: Trả về lỗi 401 (Email hoặc mật khẩu không đúng)
+            Client-->>User: Hiển thị thông báo lỗi
+        else User bị khóa (isActive = false)
+            Server-->>Client: Trả về lỗi 403 (Tài khoản bị khóa)
+            Client-->>User: Thông báo liên hệ quản trị viên
+        else Xác thực thành công
+            Server->>Server: bcrypt.compare so sánh mật khẩu
+            Server->>Server: Tạo JWT token
+            Server-->>Client: Trả về 200 OK kèm JWT Token & User Info
+            Client->>Client: Lưu token vào localStorage & cập nhật AuthContext
+            Client-->>User: Điều hướng về Dashboard
+        end
+    end
+```
+
+### 2. Luồng Nộp thuế
+
+```mermaid
+sequenceDiagram
+    actor User as Người dùng
+    participant Client as Client (React)
+    participant Server as Server (Express)
+    participant DB as Database (MongoDB)
+
+    User->>Client: Xem chi tiết tờ khai thuế (trạng thái: pending/submitted/overdue)
+    User->>Client: Nhấp chọn nút "Nộp thuế"
+    Client-->>User: Hiển thị Modal chọn phương thức thanh toán
+    User->>Client: Chọn phương thức (chuyển khoản, QR Code, tiền mặt)
+    Client->>Server: POST /api/tax/declarations/:id/pay { paymentMethod } (kèm JWT Header)
+    Server->>Server: auth Middleware xác thực JWT token
+    Server->>DB: Tìm tờ khai theo ID và User ID
+    DB-->>Server: Trả về thông tin tờ khai
+    alt Tờ khai không tồn tại
+        Server-->>Client: Trả về lỗi 404 (Không tìm thấy khai báo)
+    else Tờ khai đã nộp (status == paid)
+        Server-->>Client: Trả về lỗi 400 (Khai báo này đã được nộp thuế)
+    else Trạng thái không hợp lệ (không phải pending/submitted/overdue)
+        Server-->>Client: Trả về lỗi 400 (Trạng thái không thể nộp thuế)
+    else Dữ liệu tờ khai hợp lệ
+        Server->>Server: Cập nhật tờ khai (status = paid, paidAt = now, paymentMethod)
+        Server->>DB: Lưu tờ khai & Tạo bản ghi giao dịch Payment (status = completed)
+        DB-->>Server: Lưu dữ liệu thành công
+        Server-->>Client: Trả về 200 OK kèm thông tin tờ khai đã cập nhật
+        Client->>Client: Cập nhật state, đóng Modal thanh toán
+        Client-->>User: Hiển thị thông báo nộp thuế thành công & cập nhật lại giao diện
+    end
 ```
 
 ## Biểu thuế TNCN
