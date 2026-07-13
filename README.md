@@ -205,12 +205,12 @@ tax-system/
 ### 1. Luồng Đăng nhập & Đăng ký
 
 ```mermaid
+
 sequenceDiagram
     actor User as Người dùng
     participant Client as Client (React)
     participant Server as Server (Express)
     participant DB as Database (MongoDB)
-
     rect rgb(240, 248, 255)
         note right of User: LUỒNG ĐĂNG KÝ
         User->>Client: Nhập Họ tên, Email, Mật khẩu, CCCD, MST, SĐT
@@ -232,7 +232,6 @@ sequenceDiagram
             Client-->>User: Điều hướng về Dashboard
         end
     end
-
     rect rgb(245, 255, 250)
         note right of User: LUỒNG ĐĂNG NHẬP
         User->>Client: Nhập Email và Mật khẩu
@@ -254,6 +253,7 @@ sequenceDiagram
             Client-->>User: Điều hướng về Dashboard
         end
     end
+
 ```
 
 ### 2. Luồng Nộp thuế
