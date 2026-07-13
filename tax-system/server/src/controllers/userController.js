@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { handleControllerError } = require('../utils/errorHelpers');
 
 // GET /api/users (admin)
 exports.getAllUsers = async (req, res) => {
@@ -6,7 +7,7 @@ exports.getAllUsers = async (req, res) => {
     const users = await User.find({ role: 'user' }).select('-password');
     res.json({ success: true, data: users });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lấy danh sách người dùng.');
   }
 };
 
@@ -22,7 +23,7 @@ exports.updateProfile = async (req, res) => {
     ).select('-password');
     res.json({ success: true, data: user });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi cập nhật hồ sơ.');
   }
 };
 
@@ -53,7 +54,7 @@ exports.changePassword = async (req, res) => {
 
     res.json({ success: true, message: 'Đổi mật khẩu thành công' });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi đổi mật khẩu.');
   }
 };
 
@@ -78,6 +79,6 @@ exports.toggleUserStatus = async (req, res) => {
       data: { _id: user._id, fullName: user.fullName, email: user.email, isActive: user.isActive }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi thay đổi trạng thái người dùng.');
   }
 };

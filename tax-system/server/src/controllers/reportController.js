@@ -1,5 +1,6 @@
 const TaxDeclaration = require('../models/TaxDeclaration');
 const User = require('../models/User');
+const { handleControllerError } = require('../utils/errorHelpers');
 
 // GET /api/reports/summary  (admin: tổng quan hệ thống)
 exports.getSystemSummary = async (req, res) => {
@@ -20,7 +21,7 @@ exports.getSystemSummary = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lấy tổng quan hệ thống.');
   }
 };
 
@@ -36,7 +37,7 @@ exports.getUserReport = async (req, res) => {
 
     res.json({ success: true, data: { declarations, totalTax } });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi lấy báo cáo cá nhân.');
   }
 };
 
@@ -172,8 +173,11 @@ exports.exportPDF = async (req, res) => {
     
     doc.end();
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: err.message });
+    if (res.headersSent) {
+      console.error('[PDF Export] Error after headers sent:', err.message);
+      return res.end();
+    }
+    handleControllerError(res, err, 'Lỗi xuất PDF. Vui lòng thử lại.');
   }
 };
 
@@ -241,7 +245,7 @@ exports.exportExcel = async (req, res) => {
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.send(buffer);
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    handleControllerError(res, err, 'Lỗi xuất Excel. Vui lòng thử lại.');
   }
 };
 

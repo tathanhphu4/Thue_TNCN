@@ -1,6 +1,7 @@
 const { body, validationResult } = require('express-validator');
 const jwt  = require('jsonwebtoken');
 const User = require('../models/User');
+const { handleControllerError } = require('../utils/errorHelpers');
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
@@ -90,7 +91,7 @@ exports.register = async (req, res) => {
       }
       return res.status(400).json({ success: false, message: 'Email hoặc CCCD đã tồn tại trong hệ thống.' });
     }
-    res.status(500).json({ success: false, message: 'Lỗi đăng ký. Vui lòng thử lại.' });
+    handleControllerError(res, err, 'Lỗi đăng ký. Vui lòng thử lại.');
   }
 };
 
@@ -121,7 +122,7 @@ exports.login = async (req, res) => {
       }
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Lỗi đăng nhập. Vui lòng thử lại.' });
+    handleControllerError(res, err, 'Lỗi đăng nhập. Vui lòng thử lại.');
   }
 };
 
@@ -131,6 +132,6 @@ exports.getMe = async (req, res) => {
     const user = await User.findById(req.user._id).select('-password');
     res.json({ success: true, user });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Lỗi lấy thông tin người dùng.' });
+    handleControllerError(res, err, 'Lỗi lấy thông tin người dùng.');
   }
 };
